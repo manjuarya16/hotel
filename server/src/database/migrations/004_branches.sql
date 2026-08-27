@@ -1,0 +1,25 @@
+CREATE TABLE IF NOT EXISTS branches (
+    id BIGSERIAL PRIMARY KEY,
+    organization_id BIGINT NOT NULL REFERENCES organizations(id),
+    hotel_id BIGINT NOT NULL REFERENCES hotels(id),
+    branch_code VARCHAR(50) NOT NULL,
+    branch_name VARCHAR(150) NOT NULL,
+    phone VARCHAR(30),
+    email VARCHAR(150),
+    address_line1 VARCHAR(200),
+    address_line2 VARCHAR(200),
+    city VARCHAR(100),
+    state VARCHAR(100),
+    postal_code VARCHAR(20),
+    country VARCHAR(100) DEFAULT 'India',
+    timezone VARCHAR(80) DEFAULT 'Asia/Kolkata',
+    currency VARCHAR(10) DEFAULT 'INR',
+    check_in_time TIME DEFAULT '12:00',
+    check_out_time TIME DEFAULT '11:00',
+    status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE'
+        CHECK (status IN ('ACTIVE','INACTIVE','TEMPORARILY_CLOSED')),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (hotel_id, branch_code),
+    UNIQUE (hotel_id, branch_name)
+);

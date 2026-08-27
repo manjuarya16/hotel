@@ -1,0 +1,11 @@
+CREATE INDEX IF NOT EXISTS idx_hotels_org ON hotels(organization_id);
+CREATE INDEX IF NOT EXISTS idx_branches_org ON branches(organization_id);
+CREATE INDEX IF NOT EXISTS idx_branches_hotel ON branches(hotel_id);
+CREATE INDEX IF NOT EXISTS idx_users_org ON users(organization_id);
+CREATE INDEX IF NOT EXISTS idx_user_branches_branch ON user_branches(branch_id);
+CREATE INDEX IF NOT EXISTS idx_rooms_branch ON rooms(branch_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_branch_dates ON bookings(branch_id, check_in_date, check_out_date);
+CREATE INDEX IF NOT EXISTS idx_bookings_guest ON bookings(guest_id);
+CREATE INDEX IF NOT EXISTS idx_payments_branch ON payments(branch_id);
+CREATE INDEX IF NOT EXISTS idx_expenses_branch_date ON expenses(branch_id, expense_date);
+CREATE INDEX IF NOT EXISTS idx_audit_branch_date ON audit_logs(branch_id, created_at);
