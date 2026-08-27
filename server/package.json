@@ -1,0 +1,16 @@
+{
+  "name": "hotel-management-server",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "db:reset": "tsx src/database/reset.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.3"
+  }
+}

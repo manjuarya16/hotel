@@ -1,0 +1,11 @@
+{
+  "name": "hotel-management-client",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite"
+  },
+  "devDependencies": {
+    "vite": "^7.1.3"
+  }
+}
