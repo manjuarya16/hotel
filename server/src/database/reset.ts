@@ -1,13 +1,12 @@
 import dotenv from 'dotenv';
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
 const { Client } = pg;
-const databaseRoot = path.dirname(fileURLToPath(import.meta.url));
+const databaseRoot = __dirname;
 const sqlDirectories = ['migrations', 'functions', 'triggers', 'seeds'];
 
 function getRequiredResetFlag(): void {

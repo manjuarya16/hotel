@@ -1,150 +1,4 @@
-import './styles.css';
-
-type RouteKey =
-	| 'dashboard'
-	| 'hotels'
-	| 'transaction'
-	| 'room-book'
-	| 'booking-list'
-	| 'check-out'
-	| 'room-status'
-	| 'room-facilities'
-	| 'facilities-list'
-	| 'facilities-details'
-	| 'room-size'
-	| 'housekeeping'
-	| 'assign-room';
-
-type NavItem = {
-	key: RouteKey;
-	label: string;
-	section: string;
-	isGroup?: boolean;
-	parentKey?: RouteKey;
-};
-
-const navItems: NavItem[] = [
-	{ key: 'dashboard', label: 'Dashboard', section: 'Universal' },
-	{ key: 'hotels', label: 'Hotels', section: 'Universal' },
-	{ key: 'transaction', label: 'Transaction', section: 'Universal' },
-	{ key: 'room-book', label: 'Room Book', section: 'Room Book', isGroup: true },
-	{ key: 'booking-list', label: 'Booking List', section: 'Room Book', parentKey: 'room-book' },
-	{ key: 'check-out', label: 'Room Checkout', section: 'Room Book', parentKey: 'room-book' },
-	{ key: 'room-status', label: 'Room Status', section: 'Room Book', parentKey: 'room-book' },
-	{ key: 'room-facilities', label: 'Room Facilities', section: 'Room Facilities', isGroup: true },
-	{ key: 'facilities-list', label: 'Facilities List', section: 'Room Facilities', parentKey: 'room-facilities' },
-	{ key: 'facilities-details', label: 'Facilities Details', section: 'Room Facilities', parentKey: 'room-facilities' },
-	{ key: 'room-size', label: 'Room Size', section: 'Room Facilities', parentKey: 'room-facilities' },
-	{ key: 'housekeeping', label: 'Housekeeping', section: 'Housekeeping', isGroup: true },
-	{ key: 'assign-room', label: 'Assign Room', section: 'Housekeeping', parentKey: 'housekeeping' },
-];
-
-const root = document.querySelector<HTMLDivElement>('#root');
-const sessionKey = 'harbor-session';
-
-const API_BASE = 'http://localhost:5000/api';
-
-// API Functions
-async function fetchAPI(endpoint: string, options?: RequestInit) {
-	try {
-		const response = await fetch(`${API_BASE}${endpoint}`, {
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			...options,
-		});
-
-		if (!response.ok) {
-			throw new Error(`API Error: ${response.status}`);
-		}
-
-		return await response.json();
-	} catch (error) {
-		console.error('API call failed:', error);
-		throw error;
-	}
-}
-
-// Booking API Functions
-async function getBookings(limit = 10, offset = 0) {
-	return fetchAPI(`/bookings?limit=${limit}&offset=${offset}`);
-}
-
-async function getBooking(id: string) {
-	return fetchAPI(`/bookings/${id}`);
-}
-
-async function createBooking(booking: any) {
-	return fetchAPI('/bookings', {
-		method: 'POST',
-		body: JSON.stringify(booking),
-	});
-}
-
-async function updateBooking(id: string, booking: any) {
-	return fetchAPI(`/bookings/${id}`, {
-		method: 'PUT',
-		body: JSON.stringify(booking),
-	});
-}
-
-async function deleteBooking(id: string) {
-	return fetchAPI(`/bookings/${id}`, {
-		method: 'DELETE',
-	});
-}
-
-// Room API Functions
-async function getRooms() {
-	return fetchAPI('/rooms');
-}
-
-async function updateRoom(id: string, room: any) {
-	return fetchAPI(`/rooms/${id}`, {
-		method: 'PUT',
-		body: JSON.stringify(room),
-	});
-}
-
-// Facility API Functions
-async function getFacilities() {
-	return fetchAPI('/facilities');
-}
-
-async function createFacility(facility: any) {
-	return fetchAPI('/facilities', {
-		method: 'POST',
-		body: JSON.stringify(facility),
-	});
-}
-
-async function updateFacility(id: string, facility: any) {
-	return fetchAPI(`/facilities/${id}`, {
-		method: 'PUT',
-		body: JSON.stringify(facility),
-	});
-}
-
-async function deleteFacility(id: string) {
-	return fetchAPI(`/facilities/${id}`, {
-		method: 'DELETE',
-	});
-}
-
-function isSignedIn(): boolean {
-	return window.localStorage.getItem(sessionKey) === 'active';
-}
-
-function currentRoute(): RouteKey {
-	const key = window.location.hash.replace('#/admin/', '') as RouteKey;
-	return navItems.some((item) => item.key === key) ? key : 'dashboard';
-}
-
-function appShell(activeKey: RouteKey): string {
-	const activeItem = navItems.find((item) => item.key === activeKey) ?? navItems[1];
-	const tyre = activeKey === 'hotels' ? 'Hotels' : activeKey === 'transaction' ? 'Transaction' : activeKey === 'room-book' ? 'Room Book' : activeKey === 'booking-list' ? 'Room Booking List' : activeKey === 'check-out' ? 'Check Out' : activeItem.label;
-
-	return `
+(function(){const e=document.createElement("link").relList;if(e&&e.supports&&e.supports("modulepreload"))return;for(const a of document.querySelectorAll('link[rel="modulepreload"]'))s(a);new MutationObserver(a=>{for(const i of a)if(i.type==="childList")for(const d of i.addedNodes)d.tagName==="LINK"&&d.rel==="modulepreload"&&s(d)}).observe(document,{childList:!0,subtree:!0});function o(a){const i={};return a.integrity&&(i.integrity=a.integrity),a.referrerPolicy&&(i.referrerPolicy=a.referrerPolicy),a.crossOrigin==="use-credentials"?i.credentials="include":a.crossOrigin==="anonymous"?i.credentials="omit":i.credentials="same-origin",i}function s(a){if(a.ep)return;a.ep=!0;const i=o(a);fetch(a.href,i)}})();const c=[{key:"dashboard",label:"Dashboard",section:"Universal"},{key:"hotels",label:"Hotels",section:"Universal"},{key:"transaction",label:"Transaction",section:"Universal"},{key:"room-book",label:"Room Book",section:"Room Book",isGroup:!0},{key:"booking-list",label:"Booking List",section:"Room Book",parentKey:"room-book"},{key:"check-out",label:"Room Checkout",section:"Room Book",parentKey:"room-book"},{key:"room-status",label:"Room Status",section:"Room Book",parentKey:"room-book"},{key:"room-facilities",label:"Room Facilities",section:"Room Facilities",isGroup:!0},{key:"facilities-list",label:"Facilities List",section:"Room Facilities",parentKey:"room-facilities"},{key:"facilities-details",label:"Facilities Details",section:"Room Facilities",parentKey:"room-facilities"},{key:"room-size",label:"Room Size",section:"Room Facilities",parentKey:"room-facilities"},{key:"housekeeping",label:"Housekeeping",section:"Housekeeping",isGroup:!0},{key:"assign-room",label:"Assign Room",section:"Housekeeping",parentKey:"housekeeping"}],r=document.querySelector("#root"),b="harbor-session",y="http://localhost:5000/api";async function l(t,e){try{const o=await fetch(`${y}${t}`,{headers:{"Content-Type":"application/json"},...e});if(!o.ok)throw new Error(`API Error: ${o.status}`);return await o.json()}catch(o){throw console.error("API call failed:",o),o}}async function k(t=10,e=0){return l(`/bookings?limit=${t}&offset=${e}`)}async function f(t){return l(`/bookings/${t}`)}async function S(t){return l("/bookings",{method:"POST",body:JSON.stringify(t)})}async function w(t,e){return l(`/bookings/${t}`,{method:"PUT",body:JSON.stringify(e)})}async function A(t){return l(`/bookings/${t}`,{method:"DELETE"})}function R(){return window.localStorage.getItem(b)==="active"}function T(){const t=window.location.hash.replace("#/admin/","");return c.some(e=>e.key===t)?t:"dashboard"}function E(t){const e=c.find(s=>s.key===t)??c[1],o=t==="hotels"?"Hotels":t==="transaction"?"Transaction":t==="room-book"?"Room Book":t==="booking-list"?"Room Booking List":t==="check-out"?"Check Out":e.label;return`
     <div class="app-shell">
       <aside class="sidebar">
         <div class="user-profile">
@@ -162,7 +16,7 @@ function appShell(activeKey: RouteKey): string {
         </div>
 
         <div class="sidebar-nav">
-          ${sidebarGroupsMarkup(activeKey)}
+          ${I(t)}
         </div>
       </aside>
 
@@ -188,7 +42,7 @@ function appShell(activeKey: RouteKey): string {
 
         <div class="workspace-wrap">
           <div class="workspace-header">
-            <div class="breadcrumb">Home <span>/</span> ${tyre}</div>
+            <div class="breadcrumb">Home <span>/</span> ${o}</div>
             <div class="workspace-actions">
               <button class="mini-square" type="button">＋</button>
               <button class="mini-square" type="button">⌂</button>
@@ -196,75 +50,27 @@ function appShell(activeKey: RouteKey): string {
           </div>
 
           <div class="page-title-row">
-            <h1>${tyre}</h1>
-            ${activeKey === 'dashboard' ? '' : ''}
-            ${activeKey === 'room-book' || activeKey === 'room-status' || activeKey === 'check-out' ? '<button class="primary-action" type="button">New Booking</button>' : ''}
-            ${activeKey === 'booking-list' ? '<button class="primary-action" type="button">Book Now</button>' : ''}
-            ${activeKey === 'hotels' ? '<button class="primary-action" type="button">New Hotel</button>' : ''}
+            <h1>${o}</h1>
+            
+            ${t==="room-book"||t==="room-status"||t==="check-out"?'<button class="primary-action" type="button">New Booking</button>':""}
+            ${t==="booking-list"?'<button class="primary-action" type="button">Book Now</button>':""}
+            ${t==="hotels"?'<button class="primary-action" type="button">New Hotel</button>':""}
           </div>
 
-          ${pageContent(activeKey)}
+          ${P(t)}
         </div>
       </main>
     </div>
-  `;
-}
-
-function sidebarGroupsMarkup(activeKey: RouteKey): string {
-	const viewMap = [
-		{ label: 'Universal', items: ['dashboard', 'hotels', 'transaction'] },
-		{ label: 'Room Book', items: ['room-book', 'booking-list', 'check-out', 'room-status'] },
-		{ label: 'Room Facilities', items: ['room-facilities', 'facilities-list', 'facilities-details', 'room-size'] },
-		{ label: 'Housekeeping', items: ['housekeeping', 'assign-room'] },
-	];
-
-	return viewMap
-		.map((group) => {
-			const groupItems = group.items
-				.map((key) => {
-					const item = navItems.find((entry) => entry.key === key)!;
-					const isActive = key === activeKey;
-					const isGroupHeader = item.isGroup || key === 'room-book' || key === 'room-facilities' || key === 'housekeeping';
-					return `
-            <a class="nav-link ${isActive ? 'active' : ''} ${isGroupHeader ? 'group-header' : ''}" href="#/admin/${key}">
-              ${item.label}
+  `}function I(t){return[{label:"Universal",items:["dashboard","hotels","transaction"]},{label:"Room Book",items:["room-book","booking-list","check-out","room-status"]},{label:"Room Facilities",items:["room-facilities","facilities-list","facilities-details","room-size"]},{label:"Housekeeping",items:["housekeeping","assign-room"]}].map(o=>{const s=o.items.map(a=>{const i=c.find(g=>g.key===a),d=a===t,n=i.isGroup||a==="room-book"||a==="room-facilities"||a==="housekeeping";return`
+            <a class="nav-link ${d?"active":""} ${n?"group-header":""}" href="#/admin/${a}">
+              ${i.label}
             </a>
-          `;
-				})
-				.join('');
-
-			return `
+          `}).join("");return`
         <div class="nav-section">
-          <div class="section-label">${group.label}</div>
-          ${groupItems}
+          <div class="section-label">${o.label}</div>
+          ${s}
         </div>
-      `;
-		})
-		.join('');
-}
-
-function pageContent(key: RouteKey): string {
-	const contentMap: Record<RouteKey, string> = {
-		dashboard: dashboardPageMarkup(),
-		hotels: hotelsPageMarkup(),
-		transaction: transactionPageMarkup(),
-		'room-book': roomBookPageMarkup(),
-		'booking-list': bookingListPageMarkup(),
-		'check-out': checkOutPageMarkup(),
-		'room-status': roomStatusPageMarkup(),
-		'room-facilities': roomFacilitiesPageMarkup(),
-		'facilities-list': facilitiesListPageMarkup(),
-		'facilities-details': facilitiesDetailsPageMarkup(),
-		'room-size': roomSizePageMarkup(),
-		housekeeping: housekeepingPageMarkup(),
-		'assign-room': assignRoomPageMarkup(),
-	};
-
-	return contentMap[key] ?? hotelsPageMarkup();
-}
-
-function dashboardPageMarkup(): string {
-	return `
+      `}).join("")}function P(t){return{dashboard:F(),hotels:h(),transaction:M(),"room-book":$(),"booking-list":C(),"check-out":B(),"room-status":O(),"room-facilities":x(),"facilities-list":D(),"facilities-details":L(),"room-size":N(),housekeeping:q(),"assign-room":_()}[t]??h()}function F(){return`
     <section class="dashboard-grid">
       <div class="kpi-cards">
         <article class="kpi-card">
@@ -354,11 +160,7 @@ function dashboardPageMarkup(): string {
         </article>
       </div>
     </section>
-  `;
-}
-
-function hotelsPageMarkup(): string {
-	return `
+  `}function h(){return`
     <section class="hotels-grid">
       <article class="hotel-card" onclick="window.location.hash='#/admin/room-book'"><div class="mini-icon">📅</div><h3>Room Book</h3><p>Manage room bookings</p></article>
       <article class="hotel-card" onclick="window.location.hash='#/admin/booking-list'"><div class="mini-icon">📋</div><h3>Room List</h3><p>View all bookings</p></article>
@@ -375,11 +177,7 @@ function hotelsPageMarkup(): string {
       <article class="hotel-card"><div class="mini-icon">💰</div><h3>Purchase Report</h3><p>Spending summary</p></article>
       <article class="hotel-card"><div class="mini-icon">📦</div><h3>Stock Report</h3><p>Inventory status</p></article>
     </section>
-  `;
-}
-
-function transactionPageMarkup(): string {
-	return `
+  `}function M(){return`
     <section class="transaction-overview">
       <div class="summary-cards">
         <article class="summary-card"><div class="summary-icon">◫</div><div class="summary-body"><h4>Bill</h4><strong>$2,500.00</strong></div><div class="sparkline spark-purple"></div></article>
@@ -420,11 +218,7 @@ function transactionPageMarkup(): string {
         </table>
       </div>
     </section>
-  `;
-}
-
-function roomBookPageMarkup(): string {
-	return `
+  `}function $(){return`
     <section class="list-panel">
       <div class="table-controls top-controls">
         <div class="entries-box">Show <span>10</span> entries</div>
@@ -451,11 +245,7 @@ function roomBookPageMarkup(): string {
         </tbody>
       </table>
     </section>
-  `;
-}
-
-function bookingListPageMarkup(): string {
-	return `
+  `}function C(){return`
     <section class="list-panel">
       <div class="table-controls top-controls">
         <div class="entries-box">Show <span>10</span> entries</div>
@@ -524,11 +314,7 @@ function bookingListPageMarkup(): string {
         </form>
       </div>
     </div>
-  `;
-}
-
-function checkOutPageMarkup(): string {
-	return `
+  `}function B(){return`
     <section class="checkout-layout">
       <div class="checkout-panel">
         <div class="section-heading">Customer Details</div>
@@ -559,11 +345,7 @@ function checkOutPageMarkup(): string {
         </table>
       </div>
     </section>
-  `;
-}
-
-function roomStatusPageMarkup(): string {
-	return `
+  `}function O(){return`
     <section class="list-panel">
       <div class="table-controls top-controls">
         <div class="entries-box">Show <span>10</span> entries</div>
@@ -591,11 +373,7 @@ function roomStatusPageMarkup(): string {
         </tbody>
       </table>
     </section>
-  `;
-}
-
-function roomFacilitiesPageMarkup(): string {
-	return `
+  `}function x(){return`
     <section class="list-panel">
       <div class="table-controls top-controls">
         <div class="entries-box">Show <span>10</span> entries</div>
@@ -619,11 +397,7 @@ function roomFacilitiesPageMarkup(): string {
         </tbody>
       </table>
     </section>
-  `;
-}
-
-function facilitiesListPageMarkup(): string {
-	return `
+  `}function D(){return`
     <section class="list-panel">
       <div class="table-controls top-controls">
         <div class="entries-box">Show <span>10</span> entries</div>
@@ -648,11 +422,7 @@ function facilitiesListPageMarkup(): string {
         </tbody>
       </table>
     </section>
-  `;
-}
-
-function facilitiesDetailsPageMarkup(): string {
-	return `
+  `}function L(){return`
     <section class="list-panel">
       <div class="table-controls top-controls">
         <div class="entries-box">Show <span>10</span> entries</div>
@@ -676,11 +446,7 @@ function facilitiesDetailsPageMarkup(): string {
         </tbody>
       </table>
     </section>
-  `;
-}
-
-function roomSizePageMarkup(): string {
-	return `
+  `}function N(){return`
     <section class="list-panel">
       <div class="table-controls top-controls">
         <div class="entries-box">Show <span>10</span> entries</div>
@@ -708,11 +474,7 @@ function roomSizePageMarkup(): string {
         </tbody>
       </table>
     </section>
-  `;
-}
-
-function housekeepingPageMarkup(): string {
-	return `
+  `}function q(){return`
     <section class="list-panel">
       <div class="table-controls top-controls">
         <div class="entries-box">Show <span>10</span> entries</div>
@@ -738,11 +500,7 @@ function housekeepingPageMarkup(): string {
         </tbody>
       </table>
     </section>
-  `;
-}
-
-function assignRoomPageMarkup(): string {
-	return `
+  `}function _(){return`
     <section class="list-panel">
       <div class="table-controls top-controls">
         <div class="entries-box">Show <span>10</span> entries</div>
@@ -767,239 +525,21 @@ function assignRoomPageMarkup(): string {
         </tbody>
       </table>
     </section>
-  `;
-}
-
-function render(): void {
-	if (!root) return;
-
-	if (!isSignedIn()) {
-		root.innerHTML = loginMarkup();
-		const form = root.querySelector<HTMLFormElement>('#login-form');
-		form?.addEventListener('submit', (event) => {
-			event.preventDefault();
-			window.localStorage.setItem(sessionKey, 'active');
-			window.location.hash = '#/admin/hotels';
-			render();
-		});
-		const passwordInput = root.querySelector<HTMLInputElement>('#password');
-		const toggle = root.querySelector<HTMLButtonElement>('#show-password');
-		toggle?.addEventListener('click', () => {
-			if (!passwordInput) return;
-			const showing = passwordInput.type === 'text';
-			passwordInput.type = showing ? 'password' : 'text';
-			toggle.textContent = showing ? 'Show' : 'Hide';
-		});
-		return;
-	}
-
-	const activeKey = currentRoute();
-	root.innerHTML = appShell(activeKey);
-
-	// Attach event listeners after DOM is rendered
-	if (activeKey === 'booking-list') {
-		setupBookingListHandlers();
-	}
-
-	// Scroll to top on page change
-	window.scrollTo(0, 0);
-}
-
-function setupBookingListHandlers(): void {
-	// Load bookings on page load
-	loadBookingsTable();
-
-	// Add booking button
-	const addBtn = document.querySelector('#btn-add-booking');
-	addBtn?.addEventListener('click', () => openBookingModal());
-
-	// Modal close buttons
-	const modalCloseBtns = document.querySelectorAll('.modal-close, .modal-close-btn');
-	modalCloseBtns.forEach((btn) => {
-		btn.addEventListener('click', () => closeBookingModal());
-	});
-
-	// Booking form submit
-	const bookingForm = document.querySelector('#booking-form');
-	bookingForm?.addEventListener('submit', async (e) => {
-		e.preventDefault();
-		await saveBooking();
-	});
-}
-
-async function loadBookingsTable(): Promise<void> {
-	try {
-		const tbody = document.querySelector('#bookings-tbody');
-		if (!tbody) return;
-
-		tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;">Loading...</td></tr>';
-
-		const response = await getBookings();
-		const bookings = response.data || [];
-
-		if (bookings.length === 0) {
-			tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px; color: #7a7d7a;">No bookings found</td></tr>';
-			return;
-		}
-
-		tbody.innerHTML = bookings
-			.map(
-				(booking: any) => `
+  `}function p(){if(!r)return;if(!R()){r.innerHTML=J(),r.querySelector("#login-form")?.addEventListener("submit",a=>{a.preventDefault(),window.localStorage.setItem(b,"active"),window.location.hash="#/admin/hotels",p()});const o=r.querySelector("#password"),s=r.querySelector("#show-password");s?.addEventListener("click",()=>{if(!o)return;const a=o.type==="text";o.type=a?"password":"text",s.textContent=a?"Show":"Hide"});return}const t=T();r.innerHTML=E(t),t==="booking-list"&&H(),window.scrollTo(0,0)}function H(){u(),document.querySelector("#btn-add-booking")?.addEventListener("click",()=>m()),document.querySelectorAll(".modal-close, .modal-close-btn").forEach(s=>{s.addEventListener("click",()=>v())}),document.querySelector("#booking-form")?.addEventListener("submit",async s=>{s.preventDefault(),await G()})}async function u(){try{const t=document.querySelector("#bookings-tbody");if(!t)return;t.innerHTML='<tr><td colspan="8" style="text-align: center; padding: 20px;">Loading...</td></tr>';const o=(await k()).data||[];if(o.length===0){t.innerHTML='<tr><td colspan="8" style="text-align: center; padding: 20px; color: #7a7d7a;">No bookings found</td></tr>';return}t.innerHTML=o.map(s=>`
 		<tr>
-			<td>${booking.guest_name || 'N/A'}</td>
-			<td>${booking.room_type || 'N/A'}</td>
-			<td>${booking.check_in_date || ''}</td>
-			<td>${booking.check_out_date || ''}</td>
-			<td>$${parseFloat(booking.paid_amount || 0).toFixed(2)}</td>
-			<td>$${parseFloat(booking.balance_amount || 0).toFixed(2)}</td>
-			<td><span class="status-pill ${booking.payment_status === 'PAID' ? 'success' : 'pending'}">${booking.payment_status || 'PENDING'}</span></td>
+			<td>${s.guest_name||"N/A"}</td>
+			<td>${s.room_type||"N/A"}</td>
+			<td>${s.check_in_date||""}</td>
+			<td>${s.check_out_date||""}</td>
+			<td>$${parseFloat(s.paid_amount||0).toFixed(2)}</td>
+			<td>$${parseFloat(s.balance_amount||0).toFixed(2)}</td>
+			<td><span class="status-pill ${s.payment_status==="PAID"?"success":"pending"}">${s.payment_status||"PENDING"}</span></td>
 			<td>
-				<button class="action-btn edit-btn" data-id="${booking.id}">✎ Edit</button>
-				<button class="action-btn delete-btn" data-id="${booking.id}">✕ Delete</button>
+				<button class="action-btn edit-btn" data-id="${s.id}">✎ Edit</button>
+				<button class="action-btn delete-btn" data-id="${s.id}">✕ Delete</button>
 			</td>
 		</tr>
-	`
-			)
-			.join('');
-
-		// Attach edit/delete handlers
-		document.querySelectorAll('.edit-btn').forEach((btn) => {
-			btn.addEventListener('click', async (e) => {
-				const id = (e.target as HTMLElement).getAttribute('data-id');
-				if (id) await editBooking(id);
-			});
-		});
-
-		document.querySelectorAll('.delete-btn').forEach((btn) => {
-			btn.addEventListener('click', async (e) => {
-				const id = (e.target as HTMLElement).getAttribute('data-id');
-				if (id) await removeBooking(id);
-			});
-		});
-	} catch (error) {
-		console.error('Error loading bookings:', error);
-		const tbody = document.querySelector('#bookings-tbody');
-		if (tbody) {
-			tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #d8647a;">Error loading bookings</td></tr>';
-		}
-	}
-}
-
-function openBookingModal(booking?: any): void {
-	const modal = document.querySelector('#booking-modal');
-	if (!modal) return;
-
-	const title = document.querySelector('#modal-title');
-	if (title) {
-		title.textContent = booking ? 'Edit Booking' : 'Add Booking';
-	}
-
-	// Reset form
-	const form = document.querySelector('#booking-form') as HTMLFormElement;
-	if (form) {
-		form.reset();
-		if (booking) {
-			(document.querySelector('#booking-name') as HTMLInputElement).value = booking.guest_name || '';
-			(document.querySelector('#booking-room-type') as HTMLInputElement).value = booking.room_type || '';
-			(document.querySelector('#booking-check-in') as HTMLInputElement).value = booking.check_in_date || '';
-			(document.querySelector('#booking-check-out') as HTMLInputElement).value = booking.check_out_date || '';
-			(document.querySelector('#booking-total') as HTMLInputElement).value = booking.total_amount || '';
-			(document.querySelector('#booking-status') as HTMLSelectElement).value = booking.payment_status || 'PENDING';
-			(form as any).dataset.bookingId = booking.id;
-		} else {
-			delete (form as any).dataset.bookingId;
-		}
-	}
-
-	modal.classList.add('show');
-	modal.style.display = 'flex';
-}
-
-function closeBookingModal(): void {
-	const modal = document.querySelector('#booking-modal');
-	if (modal) {
-		modal.classList.remove('show');
-		modal.style.display = 'none';
-	}
-}
-
-async function saveBooking(): Promise<void> {
-	const form = document.querySelector('#booking-form') as HTMLFormElement;
-	if (!form) return;
-
-	const name = (document.querySelector('#booking-name') as HTMLInputElement).value;
-	const roomType = (document.querySelector('#booking-room-type') as HTMLInputElement).value;
-	const checkIn = (document.querySelector('#booking-check-in') as HTMLInputElement).value;
-	const checkOut = (document.querySelector('#booking-check-out') as HTMLInputElement).value;
-	const total = parseFloat((document.querySelector('#booking-total') as HTMLInputElement).value);
-	const status = (document.querySelector('#booking-status') as HTMLSelectElement).value;
-
-	if (!name || !roomType || !checkIn || !checkOut) {
-		alert('Please fill in all required fields');
-		return;
-	}
-
-	try {
-		const bookingId = (form as any).dataset.bookingId;
-
-		if (bookingId) {
-			// Update
-			await updateBooking(bookingId, {
-				check_in_date: checkIn,
-				check_out_date: checkOut,
-				payment_status: status,
-			});
-			alert('Booking updated successfully');
-		} else {
-			// Create
-			await createBooking({
-				organization_id: 1,
-				hotel_id: 1,
-				branch_id: 1,
-				guest_name: name,
-				check_in_date: checkIn,
-				check_out_date: checkOut,
-				room_type: roomType,
-				total_amount: total,
-				adults: 1,
-				children: 0,
-			});
-			alert('Booking created successfully');
-		}
-
-		closeBookingModal();
-		await loadBookingsTable();
-	} catch (error) {
-		console.error('Error saving booking:', error);
-		alert('Error saving booking. Please check the console.');
-	}
-}
-
-async function editBooking(id: string): Promise<void> {
-	try {
-		const booking = await getBooking(id);
-		openBookingModal(booking);
-	} catch (error) {
-		console.error('Error loading booking:', error);
-		alert('Error loading booking');
-	}
-}
-
-async function removeBooking(id: string): Promise<void> {
-	if (!confirm('Are you sure you want to delete this booking?')) return;
-
-	try {
-		await deleteBooking(id);
-		alert('Booking deleted successfully');
-		await loadBookingsTable();
-	} catch (error) {
-		console.error('Error deleting booking:', error);
-		alert('Error deleting booking');
-	}
-}
-
-function loginMarkup(): string {
-	return `
+	`).join(""),document.querySelectorAll(".edit-btn").forEach(s=>{s.addEventListener("click",async a=>{const i=a.target.getAttribute("data-id");i&&await U(i)})}),document.querySelectorAll(".delete-btn").forEach(s=>{s.addEventListener("click",async a=>{const i=a.target.getAttribute("data-id");i&&await Y(i)})})}catch(t){console.error("Error loading bookings:",t);const e=document.querySelector("#bookings-tbody");e&&(e.innerHTML='<tr><td colspan="8" style="text-align: center; color: #d8647a;">Error loading bookings</td></tr>')}}function m(t){const e=document.querySelector("#booking-modal");if(!e)return;const o=document.querySelector("#modal-title");o&&(o.textContent=t?"Edit Booking":"Add Booking");const s=document.querySelector("#booking-form");s&&(s.reset(),t?(document.querySelector("#booking-name").value=t.guest_name||"",document.querySelector("#booking-room-type").value=t.room_type||"",document.querySelector("#booking-check-in").value=t.check_in_date||"",document.querySelector("#booking-check-out").value=t.check_out_date||"",document.querySelector("#booking-total").value=t.total_amount||"",document.querySelector("#booking-status").value=t.payment_status||"PENDING",s.dataset.bookingId=t.id):delete s.dataset.bookingId),e.classList.add("show"),e.style.display="flex"}function v(){const t=document.querySelector("#booking-modal");t&&(t.classList.remove("show"),t.style.display="none")}async function G(){const t=document.querySelector("#booking-form");if(!t)return;const e=document.querySelector("#booking-name").value,o=document.querySelector("#booking-room-type").value,s=document.querySelector("#booking-check-in").value,a=document.querySelector("#booking-check-out").value,i=parseFloat(document.querySelector("#booking-total").value),d=document.querySelector("#booking-status").value;if(!e||!o||!s||!a){alert("Please fill in all required fields");return}try{const n=t.dataset.bookingId;n?(await w(n,{check_in_date:s,check_out_date:a,payment_status:d}),alert("Booking updated successfully")):(await S({organization_id:1,hotel_id:1,branch_id:1,guest_name:e,check_in_date:s,check_out_date:a,room_type:o,total_amount:i,adults:1,children:0}),alert("Booking created successfully")),v(),await u()}catch(n){console.error("Error saving booking:",n),alert("Error saving booking. Please check the console.")}}async function U(t){try{const e=await f(t);m(e)}catch(e){console.error("Error loading booking:",e),alert("Error loading booking")}}async function Y(t){if(confirm("Are you sure you want to delete this booking?"))try{await A(t),alert("Booking deleted successfully"),await u()}catch(e){console.error("Error deleting booking:",e),alert("Error deleting booking")}}function J(){return`
     <main class="login-screen">
       <section class="login-split left-panel">
         <div class="login-logo-wrap">
@@ -1040,13 +580,4 @@ function loginMarkup(): string {
         </div>
       </section>
     </main>
-  `;
-}
-
-window.addEventListener('hashchange', render);
-window.addEventListener('load', () => {
-	if (!window.location.hash) {
-		window.location.hash = '#/admin/dashboard';
-	}
-});
-render();
+  `}window.addEventListener("hashchange",p);window.addEventListener("load",()=>{window.location.hash||(window.location.hash="#/admin/dashboard")});p();
