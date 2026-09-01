@@ -13,7 +13,11 @@ type RouteKey =
 	| 'facilities-details'
 	| 'room-size'
 	| 'housekeeping'
-	| 'assign-room';
+	| 'assign-room'
+	| 'checkins'
+	| 'checkouts'
+	| 'maintenance'
+	| 'reports';
 
 type NavItem = {
 	key: RouteKey;
@@ -37,6 +41,10 @@ const navItems: NavItem[] = [
 	{ key: 'room-size', label: 'Room Size', section: 'Room Facilities', parentKey: 'room-facilities' },
 	{ key: 'housekeeping', label: 'Housekeeping', section: 'Housekeeping', isGroup: true },
 	{ key: 'assign-room', label: 'Assign Room', section: 'Housekeeping', parentKey: 'housekeeping' },
+	{ key: 'checkins', label: 'Check-ins', section: 'Operations' },
+	{ key: 'checkouts', label: 'Check-outs', section: 'Operations' },
+	{ key: 'maintenance', label: 'Maintenance', section: 'Operations' },
+	{ key: 'reports', label: 'Reports', section: 'Operations' },
 ];
 
 const root = document.querySelector<HTMLDivElement>('#root');
@@ -131,6 +139,94 @@ async function deleteFacility(id: string) {
 	});
 }
 
+// Check-in API Functions
+async function getCheckins() {
+	return fetchAPI('/checkins');
+}
+
+async function createCheckin(checkin: any) {
+	return fetchAPI('/checkins', {
+		method: 'POST',
+		body: JSON.stringify(checkin),
+	});
+}
+
+async function updateCheckin(id: string, checkin: any) {
+	return fetchAPI(`/checkins/${id}`, {
+		method: 'PUT',
+		body: JSON.stringify(checkin),
+	});
+}
+
+async function deleteCheckin(id: string) {
+	return fetchAPI(`/checkins/${id}`, {
+		method: 'DELETE',
+	});
+}
+
+// Check-out API Functions
+async function getCheckouts() {
+	return fetchAPI('/checkouts');
+}
+
+async function createCheckout(checkout: any) {
+	return fetchAPI('/checkouts', {
+		method: 'POST',
+		body: JSON.stringify(checkout),
+	});
+}
+
+async function updateCheckout(id: string, checkout: any) {
+	return fetchAPI(`/checkouts/${id}`, {
+		method: 'PUT',
+		body: JSON.stringify(checkout),
+	});
+}
+
+async function deleteCheckout(id: string) {
+	return fetchAPI(`/checkouts/${id}`, {
+		method: 'DELETE',
+	});
+}
+
+// Maintenance API Functions
+async function getMaintenances() {
+	return fetchAPI('/maintenance');
+}
+
+async function createMaintenance(maintenance: any) {
+	return fetchAPI('/maintenance', {
+		method: 'POST',
+		body: JSON.stringify(maintenance),
+	});
+}
+
+async function updateMaintenance(id: string, maintenance: any) {
+	return fetchAPI(`/maintenance/${id}`, {
+		method: 'PUT',
+		body: JSON.stringify(maintenance),
+	});
+}
+
+async function deleteMaintenance(id: string) {
+	return fetchAPI(`/maintenance/${id}`, {
+		method: 'DELETE',
+	});
+}
+
+// Reports API Functions
+async function getReportsSummary() {
+	return fetchAPI('/reports/dashboard');
+}
+
+async function getOccupancyReport() {
+	return fetchAPI('/reports/occupancy');
+}
+
+async function getRevenueReport() {
+	return fetchAPI('/reports/revenue');
+}
+
 function isSignedIn(): boolean {
 	return window.localStorage.getItem(sessionKey) === 'active';
 }
@@ -142,7 +238,7 @@ function currentRoute(): RouteKey {
 
 function appShell(activeKey: RouteKey): string {
 	const activeItem = navItems.find((item) => item.key === activeKey) ?? navItems[1];
-	const tyre = activeKey === 'hotels' ? 'Hotels' : activeKey === 'transaction' ? 'Transaction' : activeKey === 'room-book' ? 'Room Book' : activeKey === 'booking-list' ? 'Room Booking List' : activeKey === 'check-out' ? 'Check Out' : activeItem.label;
+	const tyre = activeKey === 'hotels' ? 'Hotels' : activeKey === 'transaction' ? 'Transaction' : activeKey === 'room-book' ? 'Room Book' : activeKey === 'booking-list' ? 'Room Booking List' : activeKey === 'check-out' ? 'Check Out' : activeKey === 'checkins' ? 'Check-ins' : activeKey === 'checkouts' ? 'Check-outs' : activeKey === 'maintenance' ? 'Maintenance' : activeKey === 'reports' ? 'Reports & Analytics' : activeItem.label;
 
 	return `
     <div class="app-shell">
@@ -216,6 +312,7 @@ function sidebarGroupsMarkup(activeKey: RouteKey): string {
 		{ label: 'Room Book', items: ['room-book', 'booking-list', 'check-out', 'room-status'] },
 		{ label: 'Room Facilities', items: ['room-facilities', 'facilities-list', 'facilities-details', 'room-size'] },
 		{ label: 'Housekeeping', items: ['housekeeping', 'assign-room'] },
+		{ label: 'Operations', items: ['checkins', 'checkouts', 'maintenance', 'reports'] },
 	];
 
 	return viewMap
@@ -258,6 +355,10 @@ function pageContent(key: RouteKey): string {
 		'room-size': roomSizePageMarkup(),
 		housekeeping: housekeepingPageMarkup(),
 		'assign-room': assignRoomPageMarkup(),
+		checkins: checkinsPageMarkup(),
+		checkouts: checkoutsPageMarkup(),
+		maintenance: maintenancePageMarkup(),
+		reports: reportsPageMarkup(),
 	};
 
 	return contentMap[key] ?? hotelsPageMarkup();
@@ -770,6 +871,281 @@ function assignRoomPageMarkup(): string {
   `;
 }
 
+function checkinsPageMarkup(): string {
+	return `
+    <section class="list-panel">
+      <div class="table-controls top-controls">
+        <div class="entries-box">Show <span>10</span> entries</div>
+        <div class="search-box">Search: <input type="text" /></div>
+        <button class="primary-action" id="btn-add-checkin" type="button">New Check-in</button>
+      </div>
+      <table class="data-table table-checkins">
+        <thead>
+          <tr>
+            <th>BOOKING ID</th>
+            <th>GUEST ID</th>
+            <th>ROOM ID</th>
+            <th>CHECK-IN TIME</th>
+            <th>STATUS</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody id="checkins-tbody">
+          <tr><td colspan="6" style="text-align: center; padding: 20px;">Loading...</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Add/Edit Check-in Modal -->
+    <div id="checkin-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="checkin-modal-title">New Check-in</h2>
+          <button class="modal-close" type="button">&times;</button>
+        </div>
+        <form id="checkin-form">
+          <div class="form-group">
+            <label>Booking ID *</label>
+            <input type="number" id="checkin-booking-id" required />
+          </div>
+          <div class="form-group">
+            <label>Guest ID *</label>
+            <input type="number" id="checkin-guest-id" required />
+          </div>
+          <div class="form-group">
+            <label>Room ID *</label>
+            <input type="number" id="checkin-room-id" required />
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="checkin-status">
+              <option value="CHECKED_IN">Checked In</option>
+              <option value="PENDING">Pending</option>
+            </select>
+          </div>
+          <div class="modal-actions">
+            <button type="submit" class="primary-action">Save</button>
+            <button type="button" class="modal-close-btn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+}
+
+function checkoutsPageMarkup(): string {
+	return `
+    <section class="list-panel">
+      <div class="table-controls top-controls">
+        <div class="entries-box">Show <span>10</span> entries</div>
+        <div class="search-box">Search: <input type="text" /></div>
+        <button class="primary-action" id="btn-add-checkout" type="button">New Check-out</button>
+      </div>
+      <table class="data-table table-checkouts">
+        <thead>
+          <tr>
+            <th>BOOKING ID</th>
+            <th>GUEST ID</th>
+            <th>ROOM ID</th>
+            <th>CHECK-OUT TIME</th>
+            <th>STATUS</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody id="checkouts-tbody">
+          <tr><td colspan="6" style="text-align: center; padding: 20px;">Loading...</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Add/Edit Check-out Modal -->
+    <div id="checkout-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="checkout-modal-title">New Check-out</h2>
+          <button class="modal-close" type="button">&times;</button>
+        </div>
+        <form id="checkout-form">
+          <div class="form-group">
+            <label>Booking ID *</label>
+            <input type="number" id="checkout-booking-id" required />
+          </div>
+          <div class="form-group">
+            <label>Guest ID *</label>
+            <input type="number" id="checkout-guest-id" required />
+          </div>
+          <div class="form-group">
+            <label>Room ID *</label>
+            <input type="number" id="checkout-room-id" required />
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="checkout-status">
+              <option value="PENDING">Pending</option>
+              <option value="COMPLETED">Completed</option>
+            </select>
+          </div>
+          <div class="modal-actions">
+            <button type="submit" class="primary-action">Save</button>
+            <button type="button" class="modal-close-btn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+}
+
+function maintenancePageMarkup(): string {
+	return `
+    <section class="list-panel">
+      <div class="table-controls top-controls">
+        <div class="entries-box">Show <span>10</span> entries</div>
+        <div class="search-box">Search: <input type="text" /></div>
+        <button class="primary-action" id="btn-add-maintenance" type="button">New Request</button>
+      </div>
+      <table class="data-table table-maintenance">
+        <thead>
+          <tr>
+            <th>ROOM ID</th>
+            <th>TYPE</th>
+            <th>DESCRIPTION</th>
+            <th>PRIORITY</th>
+            <th>STATUS</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody id="maintenance-tbody">
+          <tr><td colspan="6" style="text-align: center; padding: 20px;">Loading...</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Add/Edit Maintenance Modal -->
+    <div id="maintenance-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="maintenance-modal-title">New Maintenance Request</h2>
+          <button class="modal-close" type="button">&times;</button>
+        </div>
+        <form id="maintenance-form">
+          <div class="form-group">
+            <label>Room ID *</label>
+            <input type="number" id="maintenance-room-id" required />
+          </div>
+          <div class="form-group">
+            <label>Request Type *</label>
+            <input type="text" id="maintenance-type" required />
+          </div>
+          <div class="form-group">
+            <label>Description *</label>
+            <textarea id="maintenance-description" required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Priority</label>
+            <select id="maintenance-priority">
+              <option value="LOW">Low</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="HIGH">High</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="maintenance-status">
+              <option value="OPEN">Open</option>
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="CLOSED">Closed</option>
+            </select>
+          </div>
+          <div class="modal-actions">
+            <button type="submit" class="primary-action">Save</button>
+            <button type="button" class="modal-close-btn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+}
+
+function reportsPageMarkup(): string {
+	return `
+    <section class="dashboard-grid">
+      <div class="kpi-cards">
+        <article class="kpi-card">
+          <div class="kpi-header">
+            <h3 class="kpi-title">Total Bookings</h3>
+            <div class="kpi-trend positive">+05%</div>
+          </div>
+          <div class="kpi-value" id="report-bookings">0</div>
+          <div class="kpi-subtitle">All time</div>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-header">
+            <h3 class="kpi-title">Total Rooms</h3>
+            <div class="kpi-trend positive">+02%</div>
+          </div>
+          <div class="kpi-value" id="report-rooms">0</div>
+          <div class="kpi-subtitle">Available</div>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-header">
+            <h3 class="kpi-title">Total Guests</h3>
+            <div class="kpi-trend positive">+08%</div>
+          </div>
+          <div class="kpi-value" id="report-guests">0</div>
+          <div class="kpi-subtitle">All time</div>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-header">
+            <h3 class="kpi-title">Total Revenue</h3>
+            <div class="kpi-trend positive">+15%</div>
+          </div>
+          <div class="kpi-value" id="report-revenue">$0</div>
+          <div class="kpi-subtitle">All time</div>
+        </article>
+      </div>
+
+      <div class="dashboard-charts">
+        <article class="chart-card">
+          <div class="chart-header">
+            <h3>Room Occupancy</h3>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Count</th>
+              </tr>
+            </thead>
+            <tbody id="occupancy-tbody">
+              <tr><td colspan="2" style="text-align: center; padding: 20px;">Loading...</td></tr>
+            </tbody>
+          </table>
+        </article>
+
+        <article class="recent-bookings">
+          <div class="chart-header">
+            <h3>Revenue Trend (Last 30 Days)</h3>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Revenue</th>
+              </tr>
+            </thead>
+            <tbody id="revenue-tbody">
+              <tr><td colspan="2" style="text-align: center; padding: 20px;">Loading...</td></tr>
+            </tbody>
+          </table>
+        </article>
+      </div>
+    </section>
+  `;
+}
+
 function render(): void {
 	if (!root) return;
 
@@ -799,6 +1175,14 @@ function render(): void {
 	// Attach event listeners after DOM is rendered
 	if (activeKey === 'booking-list') {
 		setupBookingListHandlers();
+	} else if (activeKey === 'checkins') {
+		setupCheckinsHandlers();
+	} else if (activeKey === 'checkouts') {
+		setupCheckoutsHandlers();
+	} else if (activeKey === 'maintenance') {
+		setupMaintenanceHandlers();
+	} else if (activeKey === 'reports') {
+		setupReportsHandlers();
 	}
 
 	// Scroll to top on page change
@@ -995,6 +1379,578 @@ async function removeBooking(id: string): Promise<void> {
 	} catch (error) {
 		console.error('Error deleting booking:', error);
 		alert('Error deleting booking');
+	}
+}
+
+// Check-in Handlers
+function setupCheckinsHandlers(): void {
+	loadCheckinsTable();
+
+	const addBtn = document.querySelector('#btn-add-checkin');
+	addBtn?.addEventListener('click', () => openCheckinModal());
+
+	const modalCloseBtns = document.querySelectorAll('#checkin-modal .modal-close, #checkin-modal .modal-close-btn');
+	modalCloseBtns.forEach((btn) => {
+		btn.addEventListener('click', () => closeCheckinModal());
+	});
+
+	const checkinForm = document.querySelector('#checkin-form');
+	checkinForm?.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		await saveCheckin();
+	});
+}
+
+async function loadCheckinsTable(): Promise<void> {
+	try {
+		const tbody = document.querySelector('#checkins-tbody');
+		if (!tbody) return;
+
+		tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px;">Loading...</td></tr>';
+
+		const response = await getCheckins();
+		const checkins = response.data || [];
+
+		if (checkins.length === 0) {
+			tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #7a7d7a;">No check-ins found</td></tr>';
+			return;
+		}
+
+		tbody.innerHTML = checkins
+			.map(
+				(checkin: any) => `
+		<tr>
+			<td>${checkin.booking_id || 'N/A'}</td>
+			<td>${checkin.guest_id || 'N/A'}</td>
+			<td>${checkin.room_id || 'N/A'}</td>
+			<td>${new Date(checkin.checkin_time).toLocaleString()}</td>
+			<td><span class="status-pill ${checkin.status === 'CHECKED_IN' ? 'success' : 'pending'}">${checkin.status || 'PENDING'}</span></td>
+			<td>
+				<button class="action-btn edit-btn" data-id="${checkin.id}">✎ Edit</button>
+				<button class="action-btn delete-btn" data-id="${checkin.id}">✕ Delete</button>
+			</td>
+		</tr>
+	`
+			)
+			.join('');
+
+		document.querySelectorAll('#checkins-tbody .edit-btn').forEach((btn) => {
+			btn.addEventListener('click', async (e) => {
+				const id = (e.target as HTMLElement).getAttribute('data-id');
+				if (id) await editCheckin(id);
+			});
+		});
+
+		document.querySelectorAll('#checkins-tbody .delete-btn').forEach((btn) => {
+			btn.addEventListener('click', async (e) => {
+				const id = (e.target as HTMLElement).getAttribute('data-id');
+				if (id) await removeCheckin(id);
+			});
+		});
+	} catch (error) {
+		console.error('Error loading check-ins:', error);
+		const tbody = document.querySelector('#checkins-tbody');
+		if (tbody) {
+			tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #d8647a;">Error loading check-ins</td></tr>';
+		}
+	}
+}
+
+function openCheckinModal(checkin?: any): void {
+	const modal = document.querySelector('#checkin-modal');
+	if (!modal) return;
+
+	const title = document.querySelector('#checkin-modal-title');
+	if (title) {
+		title.textContent = checkin ? 'Edit Check-in' : 'New Check-in';
+	}
+
+	const form = document.querySelector('#checkin-form') as HTMLFormElement;
+	if (form) {
+		form.reset();
+		if (checkin) {
+			(document.querySelector('#checkin-booking-id') as HTMLInputElement).value = checkin.booking_id || '';
+			(document.querySelector('#checkin-guest-id') as HTMLInputElement).value = checkin.guest_id || '';
+			(document.querySelector('#checkin-room-id') as HTMLInputElement).value = checkin.room_id || '';
+			(document.querySelector('#checkin-status') as HTMLSelectElement).value = checkin.status || 'CHECKED_IN';
+			(form as any).dataset.checkinId = checkin.id;
+		} else {
+			delete (form as any).dataset.checkinId;
+		}
+	}
+
+	modal.classList.add('show');
+	modal.style.display = 'flex';
+}
+
+function closeCheckinModal(): void {
+	const modal = document.querySelector('#checkin-modal');
+	if (modal) {
+		modal.classList.remove('show');
+		modal.style.display = 'none';
+	}
+}
+
+async function saveCheckin(): Promise<void> {
+	const form = document.querySelector('#checkin-form') as HTMLFormElement;
+	if (!form) return;
+
+	const bookingId = (document.querySelector('#checkin-booking-id') as HTMLInputElement).value;
+	const guestId = (document.querySelector('#checkin-guest-id') as HTMLInputElement).value;
+	const roomId = (document.querySelector('#checkin-room-id') as HTMLInputElement).value;
+	const status = (document.querySelector('#checkin-status') as HTMLSelectElement).value;
+
+	if (!bookingId || !guestId || !roomId) {
+		alert('Please fill in all required fields');
+		return;
+	}
+
+	try {
+		const checkinId = (form as any).dataset.checkinId;
+
+		if (checkinId) {
+			await updateCheckin(checkinId, { status });
+			alert('Check-in updated successfully');
+		} else {
+			await createCheckin({
+				booking_id: parseInt(bookingId),
+				guest_id: parseInt(guestId),
+				room_id: parseInt(roomId),
+				status,
+			});
+			alert('Check-in created successfully');
+		}
+
+		closeCheckinModal();
+		await loadCheckinsTable();
+	} catch (error) {
+		console.error('Error saving check-in:', error);
+		alert('Error saving check-in');
+	}
+}
+
+async function editCheckin(id: string): Promise<void> {
+	try {
+		const response = await fetch(`${API_BASE}/checkins/${id}`);
+		const checkin = await response.json();
+		openCheckinModal(checkin);
+	} catch (error) {
+		console.error('Error loading check-in:', error);
+		alert('Error loading check-in');
+	}
+}
+
+async function removeCheckin(id: string): Promise<void> {
+	if (!confirm('Are you sure you want to delete this check-in?')) return;
+
+	try {
+		await deleteCheckin(id);
+		alert('Check-in deleted successfully');
+		await loadCheckinsTable();
+	} catch (error) {
+		console.error('Error deleting check-in:', error);
+		alert('Error deleting check-in');
+	}
+}
+
+// Check-out Handlers
+function setupCheckoutsHandlers(): void {
+	loadCheckoutsTable();
+
+	const addBtn = document.querySelector('#btn-add-checkout');
+	addBtn?.addEventListener('click', () => openCheckoutModal());
+
+	const modalCloseBtns = document.querySelectorAll('#checkout-modal .modal-close, #checkout-modal .modal-close-btn');
+	modalCloseBtns.forEach((btn) => {
+		btn.addEventListener('click', () => closeCheckoutModal());
+	});
+
+	const checkoutForm = document.querySelector('#checkout-form');
+	checkoutForm?.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		await saveCheckout();
+	});
+}
+
+async function loadCheckoutsTable(): Promise<void> {
+	try {
+		const tbody = document.querySelector('#checkouts-tbody');
+		if (!tbody) return;
+
+		tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px;">Loading...</td></tr>';
+
+		const response = await getCheckouts();
+		const checkouts = response.data || [];
+
+		if (checkouts.length === 0) {
+			tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #7a7d7a;">No check-outs found</td></tr>';
+			return;
+		}
+
+		tbody.innerHTML = checkouts
+			.map(
+				(checkout: any) => `
+		<tr>
+			<td>${checkout.booking_id || 'N/A'}</td>
+			<td>${checkout.guest_id || 'N/A'}</td>
+			<td>${checkout.room_id || 'N/A'}</td>
+			<td>${new Date(checkout.checkout_time).toLocaleString()}</td>
+			<td><span class="status-pill ${checkout.status === 'COMPLETED' ? 'success' : 'pending'}">${checkout.status || 'PENDING'}</span></td>
+			<td>
+				<button class="action-btn edit-btn" data-id="${checkout.id}">✎ Edit</button>
+				<button class="action-btn delete-btn" data-id="${checkout.id}">✕ Delete</button>
+			</td>
+		</tr>
+	`
+			)
+			.join('');
+
+		document.querySelectorAll('#checkouts-tbody .edit-btn').forEach((btn) => {
+			btn.addEventListener('click', async (e) => {
+				const id = (e.target as HTMLElement).getAttribute('data-id');
+				if (id) await editCheckout(id);
+			});
+		});
+
+		document.querySelectorAll('#checkouts-tbody .delete-btn').forEach((btn) => {
+			btn.addEventListener('click', async (e) => {
+				const id = (e.target as HTMLElement).getAttribute('data-id');
+				if (id) await removeCheckout(id);
+			});
+		});
+	} catch (error) {
+		console.error('Error loading check-outs:', error);
+		const tbody = document.querySelector('#checkouts-tbody');
+		if (tbody) {
+			tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #d8647a;">Error loading check-outs</td></tr>';
+		}
+	}
+}
+
+function openCheckoutModal(checkout?: any): void {
+	const modal = document.querySelector('#checkout-modal');
+	if (!modal) return;
+
+	const title = document.querySelector('#checkout-modal-title');
+	if (title) {
+		title.textContent = checkout ? 'Edit Check-out' : 'New Check-out';
+	}
+
+	const form = document.querySelector('#checkout-form') as HTMLFormElement;
+	if (form) {
+		form.reset();
+		if (checkout) {
+			(document.querySelector('#checkout-booking-id') as HTMLInputElement).value = checkout.booking_id || '';
+			(document.querySelector('#checkout-guest-id') as HTMLInputElement).value = checkout.guest_id || '';
+			(document.querySelector('#checkout-room-id') as HTMLInputElement).value = checkout.room_id || '';
+			(document.querySelector('#checkout-status') as HTMLSelectElement).value = checkout.status || 'PENDING';
+			(form as any).dataset.checkoutId = checkout.id;
+		} else {
+			delete (form as any).dataset.checkoutId;
+		}
+	}
+
+	modal.classList.add('show');
+	modal.style.display = 'flex';
+}
+
+function closeCheckoutModal(): void {
+	const modal = document.querySelector('#checkout-modal');
+	if (modal) {
+		modal.classList.remove('show');
+		modal.style.display = 'none';
+	}
+}
+
+async function saveCheckout(): Promise<void> {
+	const form = document.querySelector('#checkout-form') as HTMLFormElement;
+	if (!form) return;
+
+	const bookingId = (document.querySelector('#checkout-booking-id') as HTMLInputElement).value;
+	const guestId = (document.querySelector('#checkout-guest-id') as HTMLInputElement).value;
+	const roomId = (document.querySelector('#checkout-room-id') as HTMLInputElement).value;
+	const status = (document.querySelector('#checkout-status') as HTMLSelectElement).value;
+
+	if (!bookingId || !guestId || !roomId) {
+		alert('Please fill in all required fields');
+		return;
+	}
+
+	try {
+		const checkoutId = (form as any).dataset.checkoutId;
+
+		if (checkoutId) {
+			await updateCheckout(checkoutId, { status });
+			alert('Check-out updated successfully');
+		} else {
+			await createCheckout({
+				booking_id: parseInt(bookingId),
+				guest_id: parseInt(guestId),
+				room_id: parseInt(roomId),
+				status,
+			});
+			alert('Check-out created successfully');
+		}
+
+		closeCheckoutModal();
+		await loadCheckoutsTable();
+	} catch (error) {
+		console.error('Error saving check-out:', error);
+		alert('Error saving check-out');
+	}
+}
+
+async function editCheckout(id: string): Promise<void> {
+	try {
+		const response = await fetch(`${API_BASE}/checkouts/${id}`);
+		const checkout = await response.json();
+		openCheckoutModal(checkout);
+	} catch (error) {
+		console.error('Error loading check-out:', error);
+		alert('Error loading check-out');
+	}
+}
+
+async function removeCheckout(id: string): Promise<void> {
+	if (!confirm('Are you sure you want to delete this check-out?')) return;
+
+	try {
+		await deleteCheckout(id);
+		alert('Check-out deleted successfully');
+		await loadCheckoutsTable();
+	} catch (error) {
+		console.error('Error deleting check-out:', error);
+		alert('Error deleting check-out');
+	}
+}
+
+// Maintenance Handlers
+function setupMaintenanceHandlers(): void {
+	loadMaintenanceTable();
+
+	const addBtn = document.querySelector('#btn-add-maintenance');
+	addBtn?.addEventListener('click', () => openMaintenanceModal());
+
+	const modalCloseBtns = document.querySelectorAll('#maintenance-modal .modal-close, #maintenance-modal .modal-close-btn');
+	modalCloseBtns.forEach((btn) => {
+		btn.addEventListener('click', () => closeMaintenanceModal());
+	});
+
+	const maintenanceForm = document.querySelector('#maintenance-form');
+	maintenanceForm?.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		await saveMaintenance();
+	});
+}
+
+async function loadMaintenanceTable(): Promise<void> {
+	try {
+		const tbody = document.querySelector('#maintenance-tbody');
+		if (!tbody) return;
+
+		tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px;">Loading...</td></tr>';
+
+		const response = await getMaintenances();
+		const maintenances = response.data || [];
+
+		if (maintenances.length === 0) {
+			tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #7a7d7a;">No maintenance requests found</td></tr>';
+			return;
+		}
+
+		tbody.innerHTML = maintenances
+			.map(
+				(maintenance: any) => `
+		<tr>
+			<td>${maintenance.room_id || 'N/A'}</td>
+			<td>${maintenance.request_type || 'N/A'}</td>
+			<td>${maintenance.description || ''}</td>
+			<td><span class="status-pill">${maintenance.priority || 'MEDIUM'}</span></td>
+			<td><span class="status-pill ${maintenance.status === 'CLOSED' ? 'success' : 'pending'}">${maintenance.status || 'OPEN'}</span></td>
+			<td>
+				<button class="action-btn edit-btn" data-id="${maintenance.id}">✎ Edit</button>
+				<button class="action-btn delete-btn" data-id="${maintenance.id}">✕ Delete</button>
+			</td>
+		</tr>
+	`
+			)
+			.join('');
+
+		document.querySelectorAll('#maintenance-tbody .edit-btn').forEach((btn) => {
+			btn.addEventListener('click', async (e) => {
+				const id = (e.target as HTMLElement).getAttribute('data-id');
+				if (id) await editMaintenance(id);
+			});
+		});
+
+		document.querySelectorAll('#maintenance-tbody .delete-btn').forEach((btn) => {
+			btn.addEventListener('click', async (e) => {
+				const id = (e.target as HTMLElement).getAttribute('data-id');
+				if (id) await removeMaintenance(id);
+			});
+		});
+	} catch (error) {
+		console.error('Error loading maintenance:', error);
+		const tbody = document.querySelector('#maintenance-tbody');
+		if (tbody) {
+			tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #d8647a;">Error loading maintenance</td></tr>';
+		}
+	}
+}
+
+function openMaintenanceModal(maintenance?: any): void {
+	const modal = document.querySelector('#maintenance-modal');
+	if (!modal) return;
+
+	const title = document.querySelector('#maintenance-modal-title');
+	if (title) {
+		title.textContent = maintenance ? 'Edit Request' : 'New Maintenance Request';
+	}
+
+	const form = document.querySelector('#maintenance-form') as HTMLFormElement;
+	if (form) {
+		form.reset();
+		if (maintenance) {
+			(document.querySelector('#maintenance-room-id') as HTMLInputElement).value = maintenance.room_id || '';
+			(document.querySelector('#maintenance-type') as HTMLInputElement).value = maintenance.request_type || '';
+			(document.querySelector('#maintenance-description') as HTMLTextAreaElement).value = maintenance.description || '';
+			(document.querySelector('#maintenance-priority') as HTMLSelectElement).value = maintenance.priority || 'MEDIUM';
+			(document.querySelector('#maintenance-status') as HTMLSelectElement).value = maintenance.status || 'OPEN';
+			(form as any).dataset.maintenanceId = maintenance.id;
+		} else {
+			delete (form as any).dataset.maintenanceId;
+		}
+	}
+
+	modal.classList.add('show');
+	modal.style.display = 'flex';
+}
+
+function closeMaintenanceModal(): void {
+	const modal = document.querySelector('#maintenance-modal');
+	if (modal) {
+		modal.classList.remove('show');
+		modal.style.display = 'none';
+	}
+}
+
+async function saveMaintenance(): Promise<void> {
+	const form = document.querySelector('#maintenance-form') as HTMLFormElement;
+	if (!form) return;
+
+	const roomId = (document.querySelector('#maintenance-room-id') as HTMLInputElement).value;
+	const type = (document.querySelector('#maintenance-type') as HTMLInputElement).value;
+	const description = (document.querySelector('#maintenance-description') as HTMLTextAreaElement).value;
+	const priority = (document.querySelector('#maintenance-priority') as HTMLSelectElement).value;
+	const status = (document.querySelector('#maintenance-status') as HTMLSelectElement).value;
+
+	if (!roomId || !type || !description) {
+		alert('Please fill in all required fields');
+		return;
+	}
+
+	try {
+		const maintenanceId = (form as any).dataset.maintenanceId;
+
+		if (maintenanceId) {
+			await updateMaintenance(maintenanceId, { request_type: type, description, priority, status });
+			alert('Maintenance request updated successfully');
+		} else {
+			await createMaintenance({
+				room_id: parseInt(roomId),
+				request_type: type,
+				description,
+				priority,
+				status,
+			});
+			alert('Maintenance request created successfully');
+		}
+
+		closeMaintenanceModal();
+		await loadMaintenanceTable();
+	} catch (error) {
+		console.error('Error saving maintenance:', error);
+		alert('Error saving maintenance request');
+	}
+}
+
+async function editMaintenance(id: string): Promise<void> {
+	try {
+		const response = await fetch(`${API_BASE}/maintenance/${id}`);
+		const maintenance = await response.json();
+		openMaintenanceModal(maintenance);
+	} catch (error) {
+		console.error('Error loading maintenance:', error);
+		alert('Error loading maintenance request');
+	}
+}
+
+async function removeMaintenance(id: string): Promise<void> {
+	if (!confirm('Are you sure you want to delete this maintenance request?')) return;
+
+	try {
+		await deleteMaintenance(id);
+		alert('Maintenance request deleted successfully');
+		await loadMaintenanceTable();
+	} catch (error) {
+		console.error('Error deleting maintenance:', error);
+		alert('Error deleting maintenance request');
+	}
+}
+
+// Reports Handler
+function setupReportsHandlers(): void {
+	loadReportsSummary();
+}
+
+async function loadReportsSummary(): Promise<void> {
+	try {
+		const summary = await getReportsSummary();
+
+		const bookingsEl = document.querySelector('#report-bookings');
+		const roomsEl = document.querySelector('#report-rooms');
+		const guestsEl = document.querySelector('#report-guests');
+		const revenueEl = document.querySelector('#report-revenue');
+
+		if (bookingsEl) bookingsEl.textContent = summary.bookings || '0';
+		if (roomsEl) roomsEl.textContent = summary.rooms || '0';
+		if (guestsEl) guestsEl.textContent = summary.guests || '0';
+		if (revenueEl) revenueEl.textContent = `$${parseFloat(summary.revenue || 0).toFixed(2)}`;
+
+		// Load occupancy report
+		const occupancyResponse = await getOccupancyReport();
+		const occupancyTbody = document.querySelector('#occupancy-tbody');
+		if (occupancyTbody && occupancyResponse.data) {
+			occupancyTbody.innerHTML = occupancyResponse.data
+				.map(
+					(item: any) => `
+				<tr>
+					<td>${item.status}</td>
+					<td>${item.total}</td>
+				</tr>
+			`
+				)
+				.join('');
+		}
+
+		// Load revenue report
+		const revenueResponse = await getRevenueReport();
+		const revenueTbody = document.querySelector('#revenue-tbody');
+		if (revenueTbody && revenueResponse.data) {
+			revenueTbody.innerHTML = revenueResponse.data
+				.map(
+					(item: any) => `
+				<tr>
+					<td>${item.day}</td>
+					<td>$${parseFloat(item.revenue || 0).toFixed(2)}</td>
+				</tr>
+			`
+				)
+				.join('');
+		}
+	} catch (error) {
+		console.error('Error loading reports:', error);
+		alert('Error loading reports data');
 	}
 }
 
