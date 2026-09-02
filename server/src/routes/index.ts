@@ -11,6 +11,7 @@ import checkoutsRouter from '../modules/checkouts/routes';
 import housekeepingRouter from '../modules/housekeeping/routes';
 import maintenanceRouter from '../modules/maintenance/routes';
 import reportsRouter from '../modules/reports/routes';
+import authRouter from '../modules/auth/routes';
 import pool from '../config/database';
 
 const router = Router();
@@ -28,6 +29,7 @@ router.get('/db-test', async (_req, res) => {
   }
 });
 
+router.use('/auth', authRouter);
 router.use('/organizations', organizationsRouter);
 router.use('/hotels', hotelsRouter);
 router.use('/branches', branchesRouter);

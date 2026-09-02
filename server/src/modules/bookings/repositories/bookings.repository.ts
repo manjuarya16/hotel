@@ -6,14 +6,18 @@ export const findAll = async (limit: number, offset: number) => {
       SELECT
         b.id,
         b.booking_number,
-        CONCAT(COALESCE(g.first_name, ''), ' ', COALESCE(g.last_name, '')) AS guest_name,
+        g.name AS guest_name,
         r.room_number,
         rt.name AS room_type,
         b.check_in_date,
         b.check_out_date,
         b.paid_amount,
         b.balance_amount,
-        b.payment_status,
+        CASE
+          WHEN b.balance_amount > 0 AND b.paid_amount > 0 THEN 'PARTIAL'
+          WHEN b.balance_amount = 0 AND b.paid_amount > 0 THEN 'PAID'
+          ELSE 'PENDING'
+        END AS payment_status,
         b.status
       FROM bookings b
       LEFT JOIN guests g ON g.id = b.guest_id
@@ -32,9 +36,14 @@ export const findById = async (id: number) => {
     `
       SELECT
         b.*,
-        CONCAT(COALESCE(g.first_name, ''), ' ', COALESCE(g.last_name, '')) AS guest_name,
+        g.name AS guest_name,
         g.email,
-        g.phone
+        g.mobile AS phone,
+        CASE
+          WHEN b.balance_amount > 0 AND b.paid_amount > 0 THEN 'PARTIAL'
+          WHEN b.balance_amount = 0 AND b.paid_amount > 0 THEN 'PAID'
+          ELSE 'PENDING'
+        END AS payment_status
       FROM bookings b
       LEFT JOIN guests g ON g.id = b.guest_id
       WHERE b.id = $1

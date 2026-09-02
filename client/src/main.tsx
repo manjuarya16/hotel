@@ -49,8 +49,16 @@ const navItems: NavItem[] = [
 
 const root = document.querySelector<HTMLDivElement>('#root');
 const sessionKey = 'harbor-session';
+const userKey = 'harbor-user';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'http://localhost:3041/api';
+
+async function loginUser(email: string, password: string) {
+	return fetchAPI('/auth/login', {
+		method: 'POST',
+		body: JSON.stringify({ email, password }),
+	});
+}
 
 // API Functions
 async function fetchAPI(endpoint: string, options?: RequestInit) {
@@ -1152,11 +1160,25 @@ function render(): void {
 	if (!isSignedIn()) {
 		root.innerHTML = loginMarkup();
 		const form = root.querySelector<HTMLFormElement>('#login-form');
-		form?.addEventListener('submit', (event) => {
+		form?.addEventListener('submit', async (event) => {
 			event.preventDefault();
-			window.localStorage.setItem(sessionKey, 'active');
-			window.location.hash = '#/admin/hotels';
-			render();
+			const formData = new FormData(form);
+			const email = String(formData.get('email') || '').trim();
+			const password = String(formData.get('password') || '').trim();
+
+			try {
+				const result = await loginUser(email, password);
+				if (!result?.success) {
+					throw new Error(result?.error || 'Login failed');
+				}
+
+				window.localStorage.setItem(sessionKey, 'active');
+				window.localStorage.setItem(userKey, JSON.stringify(result.user || {}));
+				window.location.hash = '#/admin/hotels';
+				render();
+			} catch (error) {
+				alert(error instanceof Error ? error.message : 'Login failed. Please try again.');
+			}
 		});
 		const passwordInput = root.querySelector<HTMLInputElement>('#password');
 		const toggle = root.querySelector<HTMLButtonElement>('#show-password');
@@ -1981,10 +2003,10 @@ function loginMarkup(): string {
 
           <form id="login-form">
             <label>Email</label>
-            <input type="email" placeholder="you@harborhouse.com" required />
+            <input name="email" type="email" placeholder="you@harborhouse.com" required />
             <label>Password</label>
             <div class="password-row">
-              <input id="password" type="password" placeholder="Enter your password" required minlength="4" />
+              <input id="password" name="password" type="password" placeholder="Enter your password" required minlength="4" />
               <button id="show-password" type="button">Show</button>
             </div>
             <div class="remember-row">

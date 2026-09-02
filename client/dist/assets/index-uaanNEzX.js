@@ -1,4 +1,4 @@
-(function(){const a=document.createElement("link").relList;if(a&&a.supports&&a.supports("modulepreload"))return;for(const o of document.querySelectorAll('link[rel="modulepreload"]'))e(o);new MutationObserver(o=>{for(const n of o)if(n.type==="childList")for(const d of n.addedNodes)d.tagName==="LINK"&&d.rel==="modulepreload"&&e(d)}).observe(document,{childList:!0,subtree:!0});function s(o){const n={};return o.integrity&&(n.integrity=o.integrity),o.referrerPolicy&&(n.referrerPolicy=o.referrerPolicy),o.crossOrigin==="use-credentials"?n.credentials="include":o.crossOrigin==="anonymous"?n.credentials="omit":n.credentials="same-origin",n}function e(o){if(o.ep)return;o.ep=!0;const n=s(o);fetch(o.href,n)}})();const p=[{key:"dashboard",label:"Dashboard",section:"Universal"},{key:"hotels",label:"Hotels",section:"Universal"},{key:"transaction",label:"Transaction",section:"Universal"},{key:"room-book",label:"Room Book",section:"Room Book",isGroup:!0},{key:"booking-list",label:"Booking List",section:"Room Book",parentKey:"room-book"},{key:"check-out",label:"Room Checkout",section:"Room Book",parentKey:"room-book"},{key:"room-status",label:"Room Status",section:"Room Book",parentKey:"room-book"},{key:"room-facilities",label:"Room Facilities",section:"Room Facilities",isGroup:!0},{key:"facilities-list",label:"Facilities List",section:"Room Facilities",parentKey:"room-facilities"},{key:"facilities-details",label:"Facilities Details",section:"Room Facilities",parentKey:"room-facilities"},{key:"room-size",label:"Room Size",section:"Room Facilities",parentKey:"room-facilities"},{key:"housekeeping",label:"Housekeeping",section:"Housekeeping",isGroup:!0},{key:"assign-room",label:"Assign Room",section:"Housekeeping",parentKey:"housekeeping"},{key:"checkins",label:"Check-ins",section:"Operations"},{key:"checkouts",label:"Check-outs",section:"Operations"},{key:"maintenance",label:"Maintenance",section:"Operations"},{key:"reports",label:"Reports",section:"Operations"}],r=document.querySelector("#root"),f="harbor-session",h="http://localhost:5000/api";async function i(t,a){try{const s=await fetch(`${h}${t}`,{headers:{"Content-Type":"application/json"},...a});if(!s.ok)throw new Error(`API Error: ${s.status}`);return await s.json()}catch(s){throw console.error("API call failed:",s),s}}async function M(t=10,a=0){return i(`/bookings?limit=${t}&offset=${a}`)}async function R(t){return i(`/bookings/${t}`)}async function $(t){return i("/bookings",{method:"POST",body:JSON.stringify(t)})}async function L(t,a){return i(`/bookings/${t}`,{method:"PUT",body:JSON.stringify(a)})}async function x(t){return i(`/bookings/${t}`,{method:"DELETE"})}async function N(){return i("/checkins")}async function O(t){return i("/checkins",{method:"POST",body:JSON.stringify(t)})}async function P(t,a){return i(`/checkins/${t}`,{method:"PUT",body:JSON.stringify(a)})}async function D(t){return i(`/checkins/${t}`,{method:"DELETE"})}async function B(){return i("/checkouts")}async function F(t){return i("/checkouts",{method:"POST",body:JSON.stringify(t)})}async function _(t,a){return i(`/checkouts/${t}`,{method:"PUT",body:JSON.stringify(a)})}async function H(t){return i(`/checkouts/${t}`,{method:"DELETE"})}async function G(){return i("/maintenance")}async function U(t){return i("/maintenance",{method:"POST",body:JSON.stringify(t)})}async function Y(t,a){return i(`/maintenance/${t}`,{method:"PUT",body:JSON.stringify(a)})}async function J(t){return i(`/maintenance/${t}`,{method:"DELETE"})}async function j(){return i("/reports/dashboard")}async function z(){return i("/reports/occupancy")}async function W(){return i("/reports/revenue")}function K(){return window.localStorage.getItem(f)==="active"}function Q(){const t=window.location.hash.replace("#/admin/","");return p.some(a=>a.key===t)?t:"dashboard"}function V(t){const a=p.find(e=>e.key===t)??p[1],s=t==="hotels"?"Hotels":t==="transaction"?"Transaction":t==="room-book"?"Room Book":t==="booking-list"?"Room Booking List":t==="check-out"?"Check Out":t==="checkins"?"Check-ins":t==="checkouts"?"Check-outs":t==="maintenance"?"Maintenance":t==="reports"?"Reports & Analytics":a.label;return`
+(function(){const a=document.createElement("link").relList;if(a&&a.supports&&a.supports("modulepreload"))return;for(const o of document.querySelectorAll('link[rel="modulepreload"]'))e(o);new MutationObserver(o=>{for(const n of o)if(n.type==="childList")for(const d of n.addedNodes)d.tagName==="LINK"&&d.rel==="modulepreload"&&e(d)}).observe(document,{childList:!0,subtree:!0});function s(o){const n={};return o.integrity&&(n.integrity=o.integrity),o.referrerPolicy&&(n.referrerPolicy=o.referrerPolicy),o.crossOrigin==="use-credentials"?n.credentials="include":o.crossOrigin==="anonymous"?n.credentials="omit":n.credentials="same-origin",n}function e(o){if(o.ep)return;o.ep=!0;const n=s(o);fetch(o.href,n)}})();const p=[{key:"dashboard",label:"Dashboard",section:"Universal"},{key:"hotels",label:"Hotels",section:"Universal"},{key:"transaction",label:"Transaction",section:"Universal"},{key:"room-book",label:"Room Book",section:"Room Book",isGroup:!0},{key:"booking-list",label:"Booking List",section:"Room Book",parentKey:"room-book"},{key:"check-out",label:"Room Checkout",section:"Room Book",parentKey:"room-book"},{key:"room-status",label:"Room Status",section:"Room Book",parentKey:"room-book"},{key:"room-facilities",label:"Room Facilities",section:"Room Facilities",isGroup:!0},{key:"facilities-list",label:"Facilities List",section:"Room Facilities",parentKey:"room-facilities"},{key:"facilities-details",label:"Facilities Details",section:"Room Facilities",parentKey:"room-facilities"},{key:"room-size",label:"Room Size",section:"Room Facilities",parentKey:"room-facilities"},{key:"housekeeping",label:"Housekeeping",section:"Housekeeping",isGroup:!0},{key:"assign-room",label:"Assign Room",section:"Housekeeping",parentKey:"housekeeping"},{key:"checkins",label:"Check-ins",section:"Operations"},{key:"checkouts",label:"Check-outs",section:"Operations"},{key:"maintenance",label:"Maintenance",section:"Operations"},{key:"reports",label:"Reports",section:"Operations"}],l=document.querySelector("#root"),f="harbor-session",M="harbor-user",h="http://localhost:3041/api";async function R(t,a){return i("/auth/login",{method:"POST",body:JSON.stringify({email:t,password:a})})}async function i(t,a){try{const s=await fetch(`${h}${t}`,{headers:{"Content-Type":"application/json"},...a});if(!s.ok)throw new Error(`API Error: ${s.status}`);return await s.json()}catch(s){throw console.error("API call failed:",s),s}}async function L(t=10,a=0){return i(`/bookings?limit=${t}&offset=${a}`)}async function $(t){return i(`/bookings/${t}`)}async function x(t){return i("/bookings",{method:"POST",body:JSON.stringify(t)})}async function O(t,a){return i(`/bookings/${t}`,{method:"PUT",body:JSON.stringify(a)})}async function N(t){return i(`/bookings/${t}`,{method:"DELETE"})}async function P(){return i("/checkins")}async function D(t){return i("/checkins",{method:"POST",body:JSON.stringify(t)})}async function F(t,a){return i(`/checkins/${t}`,{method:"PUT",body:JSON.stringify(a)})}async function B(t){return i(`/checkins/${t}`,{method:"DELETE"})}async function _(){return i("/checkouts")}async function H(t){return i("/checkouts",{method:"POST",body:JSON.stringify(t)})}async function G(t,a){return i(`/checkouts/${t}`,{method:"PUT",body:JSON.stringify(a)})}async function U(t){return i(`/checkouts/${t}`,{method:"DELETE"})}async function J(){return i("/maintenance")}async function Y(t){return i("/maintenance",{method:"POST",body:JSON.stringify(t)})}async function j(t,a){return i(`/maintenance/${t}`,{method:"PUT",body:JSON.stringify(a)})}async function z(t){return i(`/maintenance/${t}`,{method:"DELETE"})}async function W(){return i("/reports/dashboard")}async function K(){return i("/reports/occupancy")}async function Q(){return i("/reports/revenue")}function V(){return window.localStorage.getItem(f)==="active"}function Z(){const t=window.location.hash.replace("#/admin/","");return p.some(a=>a.key===t)?t:"dashboard"}function X(t){const a=p.find(e=>e.key===t)??p[1],s=t==="hotels"?"Hotels":t==="transaction"?"Transaction":t==="room-book"?"Room Book":t==="booking-list"?"Room Booking List":t==="check-out"?"Check Out":t==="checkins"?"Check-ins":t==="checkouts"?"Check-outs":t==="maintenance"?"Maintenance":t==="reports"?"Reports & Analytics":a.label;return`
     <div class="app-shell">
       <aside class="sidebar">
         <div class="user-profile">
@@ -16,7 +16,7 @@
         </div>
 
         <div class="sidebar-nav">
-          ${Z(t)}
+          ${tt(t)}
         </div>
       </aside>
 
@@ -57,11 +57,11 @@
             ${t==="hotels"?'<button class="primary-action" type="button">New Hotel</button>':""}
           </div>
 
-          ${X(t)}
+          ${et(t)}
         </div>
       </main>
     </div>
-  `}function Z(t){return[{label:"Universal",items:["dashboard","hotels","transaction"]},{label:"Room Book",items:["room-book","booking-list","check-out","room-status"]},{label:"Room Facilities",items:["room-facilities","facilities-list","facilities-details","room-size"]},{label:"Housekeeping",items:["housekeeping","assign-room"]},{label:"Operations",items:["checkins","checkouts","maintenance","reports"]}].map(s=>{const e=s.items.map(o=>{const n=p.find(u=>u.key===o),d=o===t,c=n.isGroup||o==="room-book"||o==="room-facilities"||o==="housekeeping";return`
+  `}function tt(t){return[{label:"Universal",items:["dashboard","hotels","transaction"]},{label:"Room Book",items:["room-book","booking-list","check-out","room-status"]},{label:"Room Facilities",items:["room-facilities","facilities-list","facilities-details","room-size"]},{label:"Housekeeping",items:["housekeeping","assign-room"]},{label:"Operations",items:["checkins","checkouts","maintenance","reports"]}].map(s=>{const e=s.items.map(o=>{const n=p.find(r=>r.key===o),d=o===t,c=n.isGroup||o==="room-book"||o==="room-facilities"||o==="housekeeping";return`
             <a class="nav-link ${d?"active":""} ${c?"group-header":""}" href="#/admin/${o}">
               ${n.label}
             </a>
@@ -70,7 +70,7 @@
           <div class="section-label">${s.label}</div>
           ${e}
         </div>
-      `}).join("")}function X(t){return{dashboard:tt(),hotels:g(),transaction:et(),"room-book":at(),"booking-list":st(),"check-out":ot(),"room-status":nt(),"room-facilities":it(),"facilities-list":dt(),"facilities-details":ct(),"room-size":rt(),housekeeping:lt(),"assign-room":ut(),checkins:pt(),checkouts:ht(),maintenance:mt(),reports:bt()}[t]??g()}function tt(){return`
+      `}).join("")}function et(t){return{dashboard:at(),hotels:g(),transaction:st(),"room-book":ot(),"booking-list":nt(),"check-out":it(),"room-status":dt(),"room-facilities":ct(),"facilities-list":rt(),"facilities-details":lt(),"room-size":ut(),housekeeping:pt(),"assign-room":ht(),checkins:mt(),checkouts:bt(),maintenance:vt(),reports:yt()}[t]??g()}function at(){return`
     <section class="dashboard-grid">
       <div class="kpi-cards">
         <article class="kpi-card">
@@ -177,7 +177,7 @@
       <article class="hotel-card"><div class="mini-icon">💰</div><h3>Purchase Report</h3><p>Spending summary</p></article>
       <article class="hotel-card"><div class="mini-icon">📦</div><h3>Stock Report</h3><p>Inventory status</p></article>
     </section>
-  `}function et(){return`
+  `}function st(){return`
     <section class="transaction-overview">
       <div class="summary-cards">
         <article class="summary-card"><div class="summary-icon">◫</div><div class="summary-body"><h4>Bill</h4><strong>$2,500.00</strong></div><div class="sparkline spark-purple"></div></article>
@@ -218,7 +218,7 @@
         </table>
       </div>
     </section>
-  `}function at(){return`
+  `}function ot(){return`
     <section class="list-panel">
       <div class="table-controls top-controls">
         <div class="entries-box">Show <span>10</span> entries</div>
@@ -245,7 +245,7 @@
         </tbody>
       </table>
     </section>
-  `}function st(){return`
+  `}function nt(){return`
     <section class="list-panel">
       <div class="table-controls top-controls">
         <div class="entries-box">Show <span>10</span> entries</div>
@@ -314,7 +314,7 @@
         </form>
       </div>
     </div>
-  `}function ot(){return`
+  `}function it(){return`
     <section class="checkout-layout">
       <div class="checkout-panel">
         <div class="section-heading">Customer Details</div>
@@ -345,7 +345,7 @@
         </table>
       </div>
     </section>
-  `}function nt(){return`
+  `}function dt(){return`
     <section class="list-panel">
       <div class="table-controls top-controls">
         <div class="entries-box">Show <span>10</span> entries</div>
@@ -373,7 +373,7 @@
         </tbody>
       </table>
     </section>
-  `}function it(){return`
+  `}function ct(){return`
     <section class="list-panel">
       <div class="table-controls top-controls">
         <div class="entries-box">Show <span>10</span> entries</div>
@@ -397,7 +397,7 @@
         </tbody>
       </table>
     </section>
-  `}function dt(){return`
+  `}function rt(){return`
     <section class="list-panel">
       <div class="table-controls top-controls">
         <div class="entries-box">Show <span>10</span> entries</div>
@@ -422,7 +422,7 @@
         </tbody>
       </table>
     </section>
-  `}function ct(){return`
+  `}function lt(){return`
     <section class="list-panel">
       <div class="table-controls top-controls">
         <div class="entries-box">Show <span>10</span> entries</div>
@@ -446,7 +446,7 @@
         </tbody>
       </table>
     </section>
-  `}function rt(){return`
+  `}function ut(){return`
     <section class="list-panel">
       <div class="table-controls top-controls">
         <div class="entries-box">Show <span>10</span> entries</div>
@@ -474,7 +474,7 @@
         </tbody>
       </table>
     </section>
-  `}function lt(){return`
+  `}function pt(){return`
     <section class="list-panel">
       <div class="table-controls top-controls">
         <div class="entries-box">Show <span>10</span> entries</div>
@@ -500,7 +500,7 @@
         </tbody>
       </table>
     </section>
-  `}function ut(){return`
+  `}function ht(){return`
     <section class="list-panel">
       <div class="table-controls top-controls">
         <div class="entries-box">Show <span>10</span> entries</div>
@@ -525,7 +525,7 @@
         </tbody>
       </table>
     </section>
-  `}function pt(){return`
+  `}function mt(){return`
     <section class="list-panel">
       <div class="table-controls top-controls">
         <div class="entries-box">Show <span>10</span> entries</div>
@@ -583,7 +583,7 @@
         </form>
       </div>
     </div>
-  `}function ht(){return`
+  `}function bt(){return`
     <section class="list-panel">
       <div class="table-controls top-controls">
         <div class="entries-box">Show <span>10</span> entries</div>
@@ -641,7 +641,7 @@
         </form>
       </div>
     </div>
-  `}function mt(){return`
+  `}function vt(){return`
     <section class="list-panel">
       <div class="table-controls top-controls">
         <div class="entries-box">Show <span>10</span> entries</div>
@@ -708,7 +708,7 @@
         </form>
       </div>
     </div>
-  `}function bt(){return`
+  `}function yt(){return`
     <section class="dashboard-grid">
       <div class="kpi-cards">
         <article class="kpi-card">
@@ -784,7 +784,7 @@
         </article>
       </div>
     </section>
-  `}function m(){if(!r)return;if(!K()){r.innerHTML=Nt(),r.querySelector("#login-form")?.addEventListener("submit",o=>{o.preventDefault(),window.localStorage.setItem(f,"active"),window.location.hash="#/admin/hotels",m()});const s=r.querySelector("#password"),e=r.querySelector("#show-password");e?.addEventListener("click",()=>{if(!s)return;const o=s.type==="text";s.type=o?"password":"text",e.textContent=o?"Show":"Hide"});return}const t=Q();r.innerHTML=V(t),t==="booking-list"?vt():t==="checkins"?ft():t==="checkouts"?Ct():t==="maintenance"?At():t==="reports"&&Lt(),window.scrollTo(0,0)}function vt(){b(),document.querySelector("#btn-add-booking")?.addEventListener("click",()=>S()),document.querySelectorAll(".modal-close, .modal-close-btn").forEach(e=>{e.addEventListener("click",()=>E())}),document.querySelector("#booking-form")?.addEventListener("submit",async e=>{e.preventDefault(),await yt()})}async function b(){try{const t=document.querySelector("#bookings-tbody");if(!t)return;t.innerHTML='<tr><td colspan="8" style="text-align: center; padding: 20px;">Loading...</td></tr>';const s=(await M()).data||[];if(s.length===0){t.innerHTML='<tr><td colspan="8" style="text-align: center; padding: 20px; color: #7a7d7a;">No bookings found</td></tr>';return}t.innerHTML=s.map(e=>`
+  `}function m(){if(!l)return;if(!V()){l.innerHTML=Pt();const a=l.querySelector("#login-form");a?.addEventListener("submit",async o=>{o.preventDefault();const n=new FormData(a),d=String(n.get("email")||"").trim(),c=String(n.get("password")||"").trim();try{const r=await R(d,c);if(!r?.success)throw new Error(r?.error||"Login failed");window.localStorage.setItem(f,"active"),window.localStorage.setItem(M,JSON.stringify(r.user||{})),window.location.hash="#/admin/hotels",m()}catch(r){alert(r instanceof Error?r.message:"Login failed. Please try again.")}});const s=l.querySelector("#password"),e=l.querySelector("#show-password");e?.addEventListener("click",()=>{if(!s)return;const o=s.type==="text";s.type=o?"password":"text",e.textContent=o?"Show":"Hide"});return}const t=Z();l.innerHTML=X(t),t==="booking-list"?kt():t==="checkins"?Et():t==="checkouts"?It():t==="maintenance"?Rt():t==="reports"&&Ot(),window.scrollTo(0,0)}function kt(){b(),document.querySelector("#btn-add-booking")?.addEventListener("click",()=>S()),document.querySelectorAll(".modal-close, .modal-close-btn").forEach(e=>{e.addEventListener("click",()=>E())}),document.querySelector("#booking-form")?.addEventListener("submit",async e=>{e.preventDefault(),await gt()})}async function b(){try{const t=document.querySelector("#bookings-tbody");if(!t)return;t.innerHTML='<tr><td colspan="8" style="text-align: center; padding: 20px;">Loading...</td></tr>';const s=(await L()).data||[];if(s.length===0){t.innerHTML='<tr><td colspan="8" style="text-align: center; padding: 20px; color: #7a7d7a;">No bookings found</td></tr>';return}t.innerHTML=s.map(e=>`
 		<tr>
 			<td>${e.guest_name||"N/A"}</td>
 			<td>${e.room_type||"N/A"}</td>
@@ -798,7 +798,7 @@
 				<button class="action-btn delete-btn" data-id="${e.id}">✕ Delete</button>
 			</td>
 		</tr>
-	`).join(""),document.querySelectorAll(".edit-btn").forEach(e=>{e.addEventListener("click",async o=>{const n=o.target.getAttribute("data-id");n&&await kt(n)})}),document.querySelectorAll(".delete-btn").forEach(e=>{e.addEventListener("click",async o=>{const n=o.target.getAttribute("data-id");n&&await gt(n)})})}catch(t){console.error("Error loading bookings:",t);const a=document.querySelector("#bookings-tbody");a&&(a.innerHTML='<tr><td colspan="8" style="text-align: center; color: #d8647a;">Error loading bookings</td></tr>')}}function S(t){const a=document.querySelector("#booking-modal");if(!a)return;const s=document.querySelector("#modal-title");s&&(s.textContent=t?"Edit Booking":"Add Booking");const e=document.querySelector("#booking-form");e&&(e.reset(),t?(document.querySelector("#booking-name").value=t.guest_name||"",document.querySelector("#booking-room-type").value=t.room_type||"",document.querySelector("#booking-check-in").value=t.check_in_date||"",document.querySelector("#booking-check-out").value=t.check_out_date||"",document.querySelector("#booking-total").value=t.total_amount||"",document.querySelector("#booking-status").value=t.payment_status||"PENDING",e.dataset.bookingId=t.id):delete e.dataset.bookingId),a.classList.add("show"),a.style.display="flex"}function E(){const t=document.querySelector("#booking-modal");t&&(t.classList.remove("show"),t.style.display="none")}async function yt(){const t=document.querySelector("#booking-form");if(!t)return;const a=document.querySelector("#booking-name").value,s=document.querySelector("#booking-room-type").value,e=document.querySelector("#booking-check-in").value,o=document.querySelector("#booking-check-out").value,n=parseFloat(document.querySelector("#booking-total").value),d=document.querySelector("#booking-status").value;if(!a||!s||!e||!o){alert("Please fill in all required fields");return}try{const c=t.dataset.bookingId;c?(await L(c,{check_in_date:e,check_out_date:o,payment_status:d}),alert("Booking updated successfully")):(await $({organization_id:1,hotel_id:1,branch_id:1,guest_name:a,check_in_date:e,check_out_date:o,room_type:s,total_amount:n,adults:1,children:0}),alert("Booking created successfully")),E(),await b()}catch(c){console.error("Error saving booking:",c),alert("Error saving booking. Please check the console.")}}async function kt(t){try{const a=await R(t);S(a)}catch(a){console.error("Error loading booking:",a),alert("Error loading booking")}}async function gt(t){if(confirm("Are you sure you want to delete this booking?"))try{await x(t),alert("Booking deleted successfully"),await b()}catch(a){console.error("Error deleting booking:",a),alert("Error deleting booking")}}function ft(){v(),document.querySelector("#btn-add-checkin")?.addEventListener("click",()=>w()),document.querySelectorAll("#checkin-modal .modal-close, #checkin-modal .modal-close-btn").forEach(e=>{e.addEventListener("click",()=>C())}),document.querySelector("#checkin-form")?.addEventListener("submit",async e=>{e.preventDefault(),await St()})}async function v(){try{const t=document.querySelector("#checkins-tbody");if(!t)return;t.innerHTML='<tr><td colspan="6" style="text-align: center; padding: 20px;">Loading...</td></tr>';const s=(await N()).data||[];if(s.length===0){t.innerHTML='<tr><td colspan="6" style="text-align: center; padding: 20px; color: #7a7d7a;">No check-ins found</td></tr>';return}t.innerHTML=s.map(e=>`
+	`).join(""),document.querySelectorAll(".edit-btn").forEach(e=>{e.addEventListener("click",async o=>{const n=o.target.getAttribute("data-id");n&&await ft(n)})}),document.querySelectorAll(".delete-btn").forEach(e=>{e.addEventListener("click",async o=>{const n=o.target.getAttribute("data-id");n&&await St(n)})})}catch(t){console.error("Error loading bookings:",t);const a=document.querySelector("#bookings-tbody");a&&(a.innerHTML='<tr><td colspan="8" style="text-align: center; color: #d8647a;">Error loading bookings</td></tr>')}}function S(t){const a=document.querySelector("#booking-modal");if(!a)return;const s=document.querySelector("#modal-title");s&&(s.textContent=t?"Edit Booking":"Add Booking");const e=document.querySelector("#booking-form");e&&(e.reset(),t?(document.querySelector("#booking-name").value=t.guest_name||"",document.querySelector("#booking-room-type").value=t.room_type||"",document.querySelector("#booking-check-in").value=t.check_in_date||"",document.querySelector("#booking-check-out").value=t.check_out_date||"",document.querySelector("#booking-total").value=t.total_amount||"",document.querySelector("#booking-status").value=t.payment_status||"PENDING",e.dataset.bookingId=t.id):delete e.dataset.bookingId),a.classList.add("show"),a.style.display="flex"}function E(){const t=document.querySelector("#booking-modal");t&&(t.classList.remove("show"),t.style.display="none")}async function gt(){const t=document.querySelector("#booking-form");if(!t)return;const a=document.querySelector("#booking-name").value,s=document.querySelector("#booking-room-type").value,e=document.querySelector("#booking-check-in").value,o=document.querySelector("#booking-check-out").value,n=parseFloat(document.querySelector("#booking-total").value),d=document.querySelector("#booking-status").value;if(!a||!s||!e||!o){alert("Please fill in all required fields");return}try{const c=t.dataset.bookingId;c?(await O(c,{check_in_date:e,check_out_date:o,payment_status:d}),alert("Booking updated successfully")):(await x({organization_id:1,hotel_id:1,branch_id:1,guest_name:a,check_in_date:e,check_out_date:o,room_type:s,total_amount:n,adults:1,children:0}),alert("Booking created successfully")),E(),await b()}catch(c){console.error("Error saving booking:",c),alert("Error saving booking. Please check the console.")}}async function ft(t){try{const a=await $(t);S(a)}catch(a){console.error("Error loading booking:",a),alert("Error loading booking")}}async function St(t){if(confirm("Are you sure you want to delete this booking?"))try{await N(t),alert("Booking deleted successfully"),await b()}catch(a){console.error("Error deleting booking:",a),alert("Error deleting booking")}}function Et(){v(),document.querySelector("#btn-add-checkin")?.addEventListener("click",()=>w()),document.querySelectorAll("#checkin-modal .modal-close, #checkin-modal .modal-close-btn").forEach(e=>{e.addEventListener("click",()=>C())}),document.querySelector("#checkin-form")?.addEventListener("submit",async e=>{e.preventDefault(),await wt()})}async function v(){try{const t=document.querySelector("#checkins-tbody");if(!t)return;t.innerHTML='<tr><td colspan="6" style="text-align: center; padding: 20px;">Loading...</td></tr>';const s=(await P()).data||[];if(s.length===0){t.innerHTML='<tr><td colspan="6" style="text-align: center; padding: 20px; color: #7a7d7a;">No check-ins found</td></tr>';return}t.innerHTML=s.map(e=>`
 		<tr>
 			<td>${e.booking_id||"N/A"}</td>
 			<td>${e.guest_id||"N/A"}</td>
@@ -810,7 +810,7 @@
 				<button class="action-btn delete-btn" data-id="${e.id}">✕ Delete</button>
 			</td>
 		</tr>
-	`).join(""),document.querySelectorAll("#checkins-tbody .edit-btn").forEach(e=>{e.addEventListener("click",async o=>{const n=o.target.getAttribute("data-id");n&&await Et(n)})}),document.querySelectorAll("#checkins-tbody .delete-btn").forEach(e=>{e.addEventListener("click",async o=>{const n=o.target.getAttribute("data-id");n&&await wt(n)})})}catch(t){console.error("Error loading check-ins:",t);const a=document.querySelector("#checkins-tbody");a&&(a.innerHTML='<tr><td colspan="6" style="text-align: center; color: #d8647a;">Error loading check-ins</td></tr>')}}function w(t){const a=document.querySelector("#checkin-modal");if(!a)return;const s=document.querySelector("#checkin-modal-title");s&&(s.textContent=t?"Edit Check-in":"New Check-in");const e=document.querySelector("#checkin-form");e&&(e.reset(),t?(document.querySelector("#checkin-booking-id").value=t.booking_id||"",document.querySelector("#checkin-guest-id").value=t.guest_id||"",document.querySelector("#checkin-room-id").value=t.room_id||"",document.querySelector("#checkin-status").value=t.status||"CHECKED_IN",e.dataset.checkinId=t.id):delete e.dataset.checkinId),a.classList.add("show"),a.style.display="flex"}function C(){const t=document.querySelector("#checkin-modal");t&&(t.classList.remove("show"),t.style.display="none")}async function St(){const t=document.querySelector("#checkin-form");if(!t)return;const a=document.querySelector("#checkin-booking-id").value,s=document.querySelector("#checkin-guest-id").value,e=document.querySelector("#checkin-room-id").value,o=document.querySelector("#checkin-status").value;if(!a||!s||!e){alert("Please fill in all required fields");return}try{const n=t.dataset.checkinId;n?(await P(n,{status:o}),alert("Check-in updated successfully")):(await O({booking_id:parseInt(a),guest_id:parseInt(s),room_id:parseInt(e),status:o}),alert("Check-in created successfully")),C(),await v()}catch(n){console.error("Error saving check-in:",n),alert("Error saving check-in")}}async function Et(t){try{const s=await(await fetch(`${h}/checkins/${t}`)).json();w(s)}catch(a){console.error("Error loading check-in:",a),alert("Error loading check-in")}}async function wt(t){if(confirm("Are you sure you want to delete this check-in?"))try{await D(t),alert("Check-in deleted successfully"),await v()}catch(a){console.error("Error deleting check-in:",a),alert("Error deleting check-in")}}function Ct(){y(),document.querySelector("#btn-add-checkout")?.addEventListener("click",()=>q()),document.querySelectorAll("#checkout-modal .modal-close, #checkout-modal .modal-close-btn").forEach(e=>{e.addEventListener("click",()=>I())}),document.querySelector("#checkout-form")?.addEventListener("submit",async e=>{e.preventDefault(),await qt()})}async function y(){try{const t=document.querySelector("#checkouts-tbody");if(!t)return;t.innerHTML='<tr><td colspan="6" style="text-align: center; padding: 20px;">Loading...</td></tr>';const s=(await B()).data||[];if(s.length===0){t.innerHTML='<tr><td colspan="6" style="text-align: center; padding: 20px; color: #7a7d7a;">No check-outs found</td></tr>';return}t.innerHTML=s.map(e=>`
+	`).join(""),document.querySelectorAll("#checkins-tbody .edit-btn").forEach(e=>{e.addEventListener("click",async o=>{const n=o.target.getAttribute("data-id");n&&await Ct(n)})}),document.querySelectorAll("#checkins-tbody .delete-btn").forEach(e=>{e.addEventListener("click",async o=>{const n=o.target.getAttribute("data-id");n&&await qt(n)})})}catch(t){console.error("Error loading check-ins:",t);const a=document.querySelector("#checkins-tbody");a&&(a.innerHTML='<tr><td colspan="6" style="text-align: center; color: #d8647a;">Error loading check-ins</td></tr>')}}function w(t){const a=document.querySelector("#checkin-modal");if(!a)return;const s=document.querySelector("#checkin-modal-title");s&&(s.textContent=t?"Edit Check-in":"New Check-in");const e=document.querySelector("#checkin-form");e&&(e.reset(),t?(document.querySelector("#checkin-booking-id").value=t.booking_id||"",document.querySelector("#checkin-guest-id").value=t.guest_id||"",document.querySelector("#checkin-room-id").value=t.room_id||"",document.querySelector("#checkin-status").value=t.status||"CHECKED_IN",e.dataset.checkinId=t.id):delete e.dataset.checkinId),a.classList.add("show"),a.style.display="flex"}function C(){const t=document.querySelector("#checkin-modal");t&&(t.classList.remove("show"),t.style.display="none")}async function wt(){const t=document.querySelector("#checkin-form");if(!t)return;const a=document.querySelector("#checkin-booking-id").value,s=document.querySelector("#checkin-guest-id").value,e=document.querySelector("#checkin-room-id").value,o=document.querySelector("#checkin-status").value;if(!a||!s||!e){alert("Please fill in all required fields");return}try{const n=t.dataset.checkinId;n?(await F(n,{status:o}),alert("Check-in updated successfully")):(await D({booking_id:parseInt(a),guest_id:parseInt(s),room_id:parseInt(e),status:o}),alert("Check-in created successfully")),C(),await v()}catch(n){console.error("Error saving check-in:",n),alert("Error saving check-in")}}async function Ct(t){try{const s=await(await fetch(`${h}/checkins/${t}`)).json();w(s)}catch(a){console.error("Error loading check-in:",a),alert("Error loading check-in")}}async function qt(t){if(confirm("Are you sure you want to delete this check-in?"))try{await B(t),alert("Check-in deleted successfully"),await v()}catch(a){console.error("Error deleting check-in:",a),alert("Error deleting check-in")}}function It(){y(),document.querySelector("#btn-add-checkout")?.addEventListener("click",()=>q()),document.querySelectorAll("#checkout-modal .modal-close, #checkout-modal .modal-close-btn").forEach(e=>{e.addEventListener("click",()=>I())}),document.querySelector("#checkout-form")?.addEventListener("submit",async e=>{e.preventDefault(),await Tt()})}async function y(){try{const t=document.querySelector("#checkouts-tbody");if(!t)return;t.innerHTML='<tr><td colspan="6" style="text-align: center; padding: 20px;">Loading...</td></tr>';const s=(await _()).data||[];if(s.length===0){t.innerHTML='<tr><td colspan="6" style="text-align: center; padding: 20px; color: #7a7d7a;">No check-outs found</td></tr>';return}t.innerHTML=s.map(e=>`
 		<tr>
 			<td>${e.booking_id||"N/A"}</td>
 			<td>${e.guest_id||"N/A"}</td>
@@ -822,7 +822,7 @@
 				<button class="action-btn delete-btn" data-id="${e.id}">✕ Delete</button>
 			</td>
 		</tr>
-	`).join(""),document.querySelectorAll("#checkouts-tbody .edit-btn").forEach(e=>{e.addEventListener("click",async o=>{const n=o.target.getAttribute("data-id");n&&await It(n)})}),document.querySelectorAll("#checkouts-tbody .delete-btn").forEach(e=>{e.addEventListener("click",async o=>{const n=o.target.getAttribute("data-id");n&&await Tt(n)})})}catch(t){console.error("Error loading check-outs:",t);const a=document.querySelector("#checkouts-tbody");a&&(a.innerHTML='<tr><td colspan="6" style="text-align: center; color: #d8647a;">Error loading check-outs</td></tr>')}}function q(t){const a=document.querySelector("#checkout-modal");if(!a)return;const s=document.querySelector("#checkout-modal-title");s&&(s.textContent=t?"Edit Check-out":"New Check-out");const e=document.querySelector("#checkout-form");e&&(e.reset(),t?(document.querySelector("#checkout-booking-id").value=t.booking_id||"",document.querySelector("#checkout-guest-id").value=t.guest_id||"",document.querySelector("#checkout-room-id").value=t.room_id||"",document.querySelector("#checkout-status").value=t.status||"PENDING",e.dataset.checkoutId=t.id):delete e.dataset.checkoutId),a.classList.add("show"),a.style.display="flex"}function I(){const t=document.querySelector("#checkout-modal");t&&(t.classList.remove("show"),t.style.display="none")}async function qt(){const t=document.querySelector("#checkout-form");if(!t)return;const a=document.querySelector("#checkout-booking-id").value,s=document.querySelector("#checkout-guest-id").value,e=document.querySelector("#checkout-room-id").value,o=document.querySelector("#checkout-status").value;if(!a||!s||!e){alert("Please fill in all required fields");return}try{const n=t.dataset.checkoutId;n?(await _(n,{status:o}),alert("Check-out updated successfully")):(await F({booking_id:parseInt(a),guest_id:parseInt(s),room_id:parseInt(e),status:o}),alert("Check-out created successfully")),I(),await y()}catch(n){console.error("Error saving check-out:",n),alert("Error saving check-out")}}async function It(t){try{const s=await(await fetch(`${h}/checkouts/${t}`)).json();q(s)}catch(a){console.error("Error loading check-out:",a),alert("Error loading check-out")}}async function Tt(t){if(confirm("Are you sure you want to delete this check-out?"))try{await H(t),alert("Check-out deleted successfully"),await y()}catch(a){console.error("Error deleting check-out:",a),alert("Error deleting check-out")}}function At(){k(),document.querySelector("#btn-add-maintenance")?.addEventListener("click",()=>T()),document.querySelectorAll("#maintenance-modal .modal-close, #maintenance-modal .modal-close-btn").forEach(e=>{e.addEventListener("click",()=>A())}),document.querySelector("#maintenance-form")?.addEventListener("submit",async e=>{e.preventDefault(),await Mt()})}async function k(){try{const t=document.querySelector("#maintenance-tbody");if(!t)return;t.innerHTML='<tr><td colspan="6" style="text-align: center; padding: 20px;">Loading...</td></tr>';const s=(await G()).data||[];if(s.length===0){t.innerHTML='<tr><td colspan="6" style="text-align: center; padding: 20px; color: #7a7d7a;">No maintenance requests found</td></tr>';return}t.innerHTML=s.map(e=>`
+	`).join(""),document.querySelectorAll("#checkouts-tbody .edit-btn").forEach(e=>{e.addEventListener("click",async o=>{const n=o.target.getAttribute("data-id");n&&await At(n)})}),document.querySelectorAll("#checkouts-tbody .delete-btn").forEach(e=>{e.addEventListener("click",async o=>{const n=o.target.getAttribute("data-id");n&&await Mt(n)})})}catch(t){console.error("Error loading check-outs:",t);const a=document.querySelector("#checkouts-tbody");a&&(a.innerHTML='<tr><td colspan="6" style="text-align: center; color: #d8647a;">Error loading check-outs</td></tr>')}}function q(t){const a=document.querySelector("#checkout-modal");if(!a)return;const s=document.querySelector("#checkout-modal-title");s&&(s.textContent=t?"Edit Check-out":"New Check-out");const e=document.querySelector("#checkout-form");e&&(e.reset(),t?(document.querySelector("#checkout-booking-id").value=t.booking_id||"",document.querySelector("#checkout-guest-id").value=t.guest_id||"",document.querySelector("#checkout-room-id").value=t.room_id||"",document.querySelector("#checkout-status").value=t.status||"PENDING",e.dataset.checkoutId=t.id):delete e.dataset.checkoutId),a.classList.add("show"),a.style.display="flex"}function I(){const t=document.querySelector("#checkout-modal");t&&(t.classList.remove("show"),t.style.display="none")}async function Tt(){const t=document.querySelector("#checkout-form");if(!t)return;const a=document.querySelector("#checkout-booking-id").value,s=document.querySelector("#checkout-guest-id").value,e=document.querySelector("#checkout-room-id").value,o=document.querySelector("#checkout-status").value;if(!a||!s||!e){alert("Please fill in all required fields");return}try{const n=t.dataset.checkoutId;n?(await G(n,{status:o}),alert("Check-out updated successfully")):(await H({booking_id:parseInt(a),guest_id:parseInt(s),room_id:parseInt(e),status:o}),alert("Check-out created successfully")),I(),await y()}catch(n){console.error("Error saving check-out:",n),alert("Error saving check-out")}}async function At(t){try{const s=await(await fetch(`${h}/checkouts/${t}`)).json();q(s)}catch(a){console.error("Error loading check-out:",a),alert("Error loading check-out")}}async function Mt(t){if(confirm("Are you sure you want to delete this check-out?"))try{await U(t),alert("Check-out deleted successfully"),await y()}catch(a){console.error("Error deleting check-out:",a),alert("Error deleting check-out")}}function Rt(){k(),document.querySelector("#btn-add-maintenance")?.addEventListener("click",()=>T()),document.querySelectorAll("#maintenance-modal .modal-close, #maintenance-modal .modal-close-btn").forEach(e=>{e.addEventListener("click",()=>A())}),document.querySelector("#maintenance-form")?.addEventListener("submit",async e=>{e.preventDefault(),await Lt()})}async function k(){try{const t=document.querySelector("#maintenance-tbody");if(!t)return;t.innerHTML='<tr><td colspan="6" style="text-align: center; padding: 20px;">Loading...</td></tr>';const s=(await J()).data||[];if(s.length===0){t.innerHTML='<tr><td colspan="6" style="text-align: center; padding: 20px; color: #7a7d7a;">No maintenance requests found</td></tr>';return}t.innerHTML=s.map(e=>`
 		<tr>
 			<td>${e.room_id||"N/A"}</td>
 			<td>${e.request_type||"N/A"}</td>
@@ -834,17 +834,17 @@
 				<button class="action-btn delete-btn" data-id="${e.id}">✕ Delete</button>
 			</td>
 		</tr>
-	`).join(""),document.querySelectorAll("#maintenance-tbody .edit-btn").forEach(e=>{e.addEventListener("click",async o=>{const n=o.target.getAttribute("data-id");n&&await Rt(n)})}),document.querySelectorAll("#maintenance-tbody .delete-btn").forEach(e=>{e.addEventListener("click",async o=>{const n=o.target.getAttribute("data-id");n&&await $t(n)})})}catch(t){console.error("Error loading maintenance:",t);const a=document.querySelector("#maintenance-tbody");a&&(a.innerHTML='<tr><td colspan="6" style="text-align: center; color: #d8647a;">Error loading maintenance</td></tr>')}}function T(t){const a=document.querySelector("#maintenance-modal");if(!a)return;const s=document.querySelector("#maintenance-modal-title");s&&(s.textContent=t?"Edit Request":"New Maintenance Request");const e=document.querySelector("#maintenance-form");e&&(e.reset(),t?(document.querySelector("#maintenance-room-id").value=t.room_id||"",document.querySelector("#maintenance-type").value=t.request_type||"",document.querySelector("#maintenance-description").value=t.description||"",document.querySelector("#maintenance-priority").value=t.priority||"MEDIUM",document.querySelector("#maintenance-status").value=t.status||"OPEN",e.dataset.maintenanceId=t.id):delete e.dataset.maintenanceId),a.classList.add("show"),a.style.display="flex"}function A(){const t=document.querySelector("#maintenance-modal");t&&(t.classList.remove("show"),t.style.display="none")}async function Mt(){const t=document.querySelector("#maintenance-form");if(!t)return;const a=document.querySelector("#maintenance-room-id").value,s=document.querySelector("#maintenance-type").value,e=document.querySelector("#maintenance-description").value,o=document.querySelector("#maintenance-priority").value,n=document.querySelector("#maintenance-status").value;if(!a||!s||!e){alert("Please fill in all required fields");return}try{const d=t.dataset.maintenanceId;d?(await Y(d,{request_type:s,description:e,priority:o,status:n}),alert("Maintenance request updated successfully")):(await U({room_id:parseInt(a),request_type:s,description:e,priority:o,status:n}),alert("Maintenance request created successfully")),A(),await k()}catch(d){console.error("Error saving maintenance:",d),alert("Error saving maintenance request")}}async function Rt(t){try{const s=await(await fetch(`${h}/maintenance/${t}`)).json();T(s)}catch(a){console.error("Error loading maintenance:",a),alert("Error loading maintenance request")}}async function $t(t){if(confirm("Are you sure you want to delete this maintenance request?"))try{await J(t),alert("Maintenance request deleted successfully"),await k()}catch(a){console.error("Error deleting maintenance:",a),alert("Error deleting maintenance request")}}function Lt(){xt()}async function xt(){try{const t=await j(),a=document.querySelector("#report-bookings"),s=document.querySelector("#report-rooms"),e=document.querySelector("#report-guests"),o=document.querySelector("#report-revenue");a&&(a.textContent=t.bookings||"0"),s&&(s.textContent=t.rooms||"0"),e&&(e.textContent=t.guests||"0"),o&&(o.textContent=`$${parseFloat(t.revenue||0).toFixed(2)}`);const n=await z(),d=document.querySelector("#occupancy-tbody");d&&n.data&&(d.innerHTML=n.data.map(l=>`
+	`).join(""),document.querySelectorAll("#maintenance-tbody .edit-btn").forEach(e=>{e.addEventListener("click",async o=>{const n=o.target.getAttribute("data-id");n&&await $t(n)})}),document.querySelectorAll("#maintenance-tbody .delete-btn").forEach(e=>{e.addEventListener("click",async o=>{const n=o.target.getAttribute("data-id");n&&await xt(n)})})}catch(t){console.error("Error loading maintenance:",t);const a=document.querySelector("#maintenance-tbody");a&&(a.innerHTML='<tr><td colspan="6" style="text-align: center; color: #d8647a;">Error loading maintenance</td></tr>')}}function T(t){const a=document.querySelector("#maintenance-modal");if(!a)return;const s=document.querySelector("#maintenance-modal-title");s&&(s.textContent=t?"Edit Request":"New Maintenance Request");const e=document.querySelector("#maintenance-form");e&&(e.reset(),t?(document.querySelector("#maintenance-room-id").value=t.room_id||"",document.querySelector("#maintenance-type").value=t.request_type||"",document.querySelector("#maintenance-description").value=t.description||"",document.querySelector("#maintenance-priority").value=t.priority||"MEDIUM",document.querySelector("#maintenance-status").value=t.status||"OPEN",e.dataset.maintenanceId=t.id):delete e.dataset.maintenanceId),a.classList.add("show"),a.style.display="flex"}function A(){const t=document.querySelector("#maintenance-modal");t&&(t.classList.remove("show"),t.style.display="none")}async function Lt(){const t=document.querySelector("#maintenance-form");if(!t)return;const a=document.querySelector("#maintenance-room-id").value,s=document.querySelector("#maintenance-type").value,e=document.querySelector("#maintenance-description").value,o=document.querySelector("#maintenance-priority").value,n=document.querySelector("#maintenance-status").value;if(!a||!s||!e){alert("Please fill in all required fields");return}try{const d=t.dataset.maintenanceId;d?(await j(d,{request_type:s,description:e,priority:o,status:n}),alert("Maintenance request updated successfully")):(await Y({room_id:parseInt(a),request_type:s,description:e,priority:o,status:n}),alert("Maintenance request created successfully")),A(),await k()}catch(d){console.error("Error saving maintenance:",d),alert("Error saving maintenance request")}}async function $t(t){try{const s=await(await fetch(`${h}/maintenance/${t}`)).json();T(s)}catch(a){console.error("Error loading maintenance:",a),alert("Error loading maintenance request")}}async function xt(t){if(confirm("Are you sure you want to delete this maintenance request?"))try{await z(t),alert("Maintenance request deleted successfully"),await k()}catch(a){console.error("Error deleting maintenance:",a),alert("Error deleting maintenance request")}}function Ot(){Nt()}async function Nt(){try{const t=await W(),a=document.querySelector("#report-bookings"),s=document.querySelector("#report-rooms"),e=document.querySelector("#report-guests"),o=document.querySelector("#report-revenue");a&&(a.textContent=t.bookings||"0"),s&&(s.textContent=t.rooms||"0"),e&&(e.textContent=t.guests||"0"),o&&(o.textContent=`$${parseFloat(t.revenue||0).toFixed(2)}`);const n=await K(),d=document.querySelector("#occupancy-tbody");d&&n.data&&(d.innerHTML=n.data.map(u=>`
 				<tr>
-					<td>${l.status}</td>
-					<td>${l.total}</td>
+					<td>${u.status}</td>
+					<td>${u.total}</td>
 				</tr>
-			`).join(""));const c=await W(),u=document.querySelector("#revenue-tbody");u&&c.data&&(u.innerHTML=c.data.map(l=>`
+			`).join(""));const c=await Q(),r=document.querySelector("#revenue-tbody");r&&c.data&&(r.innerHTML=c.data.map(u=>`
 				<tr>
-					<td>${l.day}</td>
-					<td>$${parseFloat(l.revenue||0).toFixed(2)}</td>
+					<td>${u.day}</td>
+					<td>$${parseFloat(u.revenue||0).toFixed(2)}</td>
 				</tr>
-			`).join(""))}catch(t){console.error("Error loading reports:",t),alert("Error loading reports data")}}function Nt(){return`
+			`).join(""))}catch(t){console.error("Error loading reports:",t),alert("Error loading reports data")}}function Pt(){return`
     <main class="login-screen">
       <section class="login-split left-panel">
         <div class="login-logo-wrap">
@@ -870,10 +870,10 @@
 
           <form id="login-form">
             <label>Email</label>
-            <input type="email" placeholder="you@harborhouse.com" required />
+            <input name="email" type="email" placeholder="you@harborhouse.com" required />
             <label>Password</label>
             <div class="password-row">
-              <input id="password" type="password" placeholder="Enter your password" required minlength="4" />
+              <input id="password" name="password" type="password" placeholder="Enter your password" required minlength="4" />
               <button id="show-password" type="button">Show</button>
             </div>
             <div class="remember-row">
